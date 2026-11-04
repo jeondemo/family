@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FBF7F2">
+<meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="가족 영상">
@@ -11,120 +11,126 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-:root{--bg:#FBF7F2;--ink:#2A2420;--muted:#6B5F55;--line:#EADFD2;--soft:#F1E9DF;--accent:#B4491A;--field:#D8CBBE}
+:root{--bg:#FFFFFF;--ink:#2B3A5C;--text:#2B3A5C;--muted:#7B7468;--line:#EEE8DE;--soft:#FAF7F1;--ring:#E3D3B5;--gold:#8A6A35;--accent:#2B3A5C;--field:#DDD5C8;--shadow:0 14px 30px rgba(43,58,92,.10)}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-tap-highlight-color:transparent;letter-spacing:-.2px}
 a{color:var(--accent)}
 button{font:inherit;cursor:pointer}
 .wrap{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:110px}
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0}
-.hdr h1{font-size:22px;font-weight:800;letter-spacing:-.5px;margin:0}
-.bar{display:flex;align-items:center;gap:4px;padding:12px 12px 8px;position:sticky;top:0;background:var(--bg);z-index:5}
-.bar h1{font-size:20px;font-weight:800;margin:0;letter-spacing:-.5px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;padding:26px 20px 0}
+.top small{display:block;font-size:12px;font-weight:600;color:var(--gold);margin-bottom:4px}
+.top h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.8px}
+.top img{width:40px;height:40px;border-radius:10px}
+.bar{display:flex;align-items:center;gap:4px;padding:12px 12px 8px;position:sticky;top:0;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:5}
+.bar h1{font-size:20px;font-weight:800;margin:0;letter-spacing:-.6px}
 .bar .grow{flex:1}
 .ib{width:44px;height:44px;border:none;background:transparent;border-radius:22px;display:flex;align-items:center;justify-content:center;color:var(--ink);text-decoration:none;flex:0 0 auto}
-.sec{padding:0 20px;margin-top:26px}
-.sec-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:10px}
-.sec-h h2{font-size:17px;font-weight:800;margin:0}
+.sec{padding:0 20px;margin-top:30px}
+.h2row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.h2row h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.5px}
+.h2row i{flex:1;height:1px;background:var(--line)}
 .muted{color:var(--muted);font-size:13px}
-.card{display:block;background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;color:inherit;text-decoration:none}
-.thumb{position:relative;background:#E8DED3 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
-.big{aspect-ratio:16/9}
-.tag{position:absolute;left:12px;top:12px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:10px}
-.card-b{padding:14px 16px;display:flex;flex-direction:column;gap:4px}
-.card-b b{font-size:16px}
-.shuffle{margin-top:10px;width:100%;height:46px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
-.hscroll{display:flex;gap:10px;overflow-x:auto;padding:0 20px;scrollbar-width:none}
+.thumb{position:relative;background:#E9E2D6 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+.hero{display:block;text-decoration:none;color:var(--ink);border-radius:24px;overflow:hidden;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
+.hero .thumb{height:auto;aspect-ratio:16/10;overflow:visible}
+.hero-badge{position:absolute;left:16px;top:16px;background:#fff;color:var(--ink);font-size:12px;font-weight:700;padding:5px 12px;border-radius:14px;box-shadow:0 2px 8px rgba(43,58,92,.12)}
+.hero-play{position:absolute;right:16px;bottom:-26px;width:52px;height:52px;border-radius:26px;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(43,58,92,.3)}
+.hero-b{padding:18px 84px 20px 20px;display:flex;flex-direction:column;gap:6px}
+.hero-b b{font-size:20px;font-weight:700;letter-spacing:-.6px;line-height:1.35}
+.shuffle{margin-top:12px;width:100%;height:46px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.alb4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.alb{text-decoration:none;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:8px;padding:4px 0}
+.alb i{width:64px;height:64px;border-radius:32px;background:var(--soft);border:1px solid var(--ring);display:flex;align-items:center;justify-content:center}
+.alb b{font-size:14px;font-weight:700}
+.alb span{font-size:11px;color:var(--muted);margin-top:-4px}
+.morealb{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.hscroll{display:flex;gap:12px;overflow-x:auto;padding:0 20px 4px;scrollbar-width:none;scroll-snap-type:x mandatory;scroll-padding:0 20px}
 .hscroll::-webkit-scrollbar{display:none}
-.album{flex:0 0 112px;padding:14px;border-radius:16px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);background:#fff}
-.album i{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
-.album b{font-size:15px}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.ytile{text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
-.ythumb{height:76px;background:#6B5F55 center/cover no-repeat;position:relative;display:flex;align-items:flex-end;padding:0 12px 8px}
-.ythumb::after{content:'';position:absolute;inset:0;background:rgba(30,26,23,.42)}
-.ythumb span{position:relative;z-index:1;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px}
-.ytile-b{padding:9px 12px;display:flex;justify-content:space-between;align-items:center}
-.fab{position:fixed;right:max(20px,calc(50% - 220px));bottom:calc(28px + env(safe-area-inset-bottom));height:54px;padding:0 20px;border-radius:27px;background:var(--accent);color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;box-shadow:0 6px 16px rgba(42,36,32,.22);z-index:10}
-.empty{border:2px dashed var(--field);border-radius:20px;padding:28px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
-.empty i{width:56px;height:56px;border-radius:28px;background:#F8DCCB;display:flex;align-items:center;justify-content:center}
-.pill-btn{height:46px;padding:0 20px;border-radius:23px;background:var(--accent);color:#fff;text-decoration:none;display:inline-flex;align-items:center;font-size:14px;font-weight:700;border:none}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:0 56px 12px 20px;scrollbar-width:none;position:sticky;top:64px;background:var(--bg);z-index:4}
+.ycard{flex:0 0 136px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:8px;scroll-snap-align:start}
+.ycard .thumb{height:170px;border-radius:16px}
+.ycard div{display:flex;justify-content:space-between;align-items:baseline;padding:0 2px}
+.ycard b{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.fab{position:fixed;right:max(20px,calc(50% - 220px));bottom:calc(28px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:30px;background:var(--accent);color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(43,58,92,.3);z-index:10}
+.empty{border:1.5px dashed var(--ring);border-radius:24px;padding:30px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;background:var(--soft)}
+.empty i{width:56px;height:56px;border-radius:28px;background:#fff;border:1px solid var(--ring);display:flex;align-items:center;justify-content:center}
+.pill-btn{height:46px;padding:0 22px;border-radius:23px;background:var(--accent);color:#fff;text-decoration:none;display:inline-flex;align-items:center;font-size:14px;font-weight:700;border:none}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 56px 12px 20px;scrollbar-width:none;position:sticky;top:64px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:4}
 .chips::-webkit-scrollbar{display:none}
 .chip{height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:700;flex:0 0 auto;color:var(--ink)}
 .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.chip:disabled{background:transparent;color:#8A7E73;border:1px dashed var(--field);cursor:default}
+.chip:disabled{background:transparent;color:#A49C90;border:1px dashed var(--field);cursor:default}
 .list{padding:4px 56px 20px 20px}
 .list.full{padding-right:20px}
-.mon{margin-bottom:22px}
-.mon-h{display:flex;gap:8px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:10px;scroll-margin-top:120px}
-.mon-h h2{font-size:17px;font-weight:800;margin:0}
-.vt{text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:5px;min-width:0}
-.vt .thumb{aspect-ratio:16/9;border-radius:12px}
-.vt b{font-size:13px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.day{position:absolute;left:6px;top:6px;background:#fff;color:var(--ink);font-size:11px;font-weight:700;padding:1px 7px;border-radius:8px}
-.scrub{position:fixed;right:max(6px,calc(50% - 234px));top:120px;bottom:24px;width:40px;display:flex;flex-direction:column;align-items:center;justify-content:space-around;background:var(--soft);border-radius:20px;touch-action:none;padding:8px 0;z-index:6}
+.mon{margin-bottom:26px}
+.mon-h{display:flex;gap:8px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px;scroll-margin-top:120px}
+.mon-h h2{font-size:18px;font-weight:800;margin:0;letter-spacing:-.5px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.vt{text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:6px;min-width:0}
+.vt .thumb{aspect-ratio:16/9;border-radius:14px}
+.vt b{font-size:13px;font-weight:600;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.day{position:absolute;left:6px;top:6px;background:#fff;color:var(--ink);font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px}
+.scrub{position:fixed;right:max(6px,calc(50% - 234px));top:120px;bottom:24px;width:40px;display:flex;flex-direction:column;align-items:center;justify-content:space-around;background:var(--soft);border:1px solid var(--line);border-radius:20px;touch-action:none;padding:8px 0;z-index:6}
 .scrub button{width:32px;min-height:22px;flex:1 1 auto;max-height:36px;border:none;background:transparent;border-radius:14px;font-size:11px;font-weight:700;color:var(--muted)}
 .scrub button.on{background:var(--accent);color:#fff}
-.video{width:100%;aspect-ratio:16/9;background:#1E1A17}
+.video{width:100%;aspect-ratio:16/9;background:#111}
 .video iframe{width:100%;height:100%;border:0;display:block}
-.info{padding:18px 20px 14px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--line)}
-.info h2{margin:0;font-size:20px;font-weight:800;line-height:1.35}
+.info{padding:20px 20px 16px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--line)}
+.info small{font-size:12px;font-weight:600;color:var(--gold)}
+.info h2{margin:0;font-size:21px;font-weight:800;line-height:1.35;letter-spacing:-.6px}
 .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
-.badge{padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700}
-.atag{padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--soft);color:var(--ink);text-decoration:none}
-.memo{margin:0;font-size:14px;line-height:1.6;color:#463C35;white-space:pre-wrap}
-.navgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 20px}
+.badge{padding:3px 9px;border-radius:10px;font-size:12px;font-weight:700}
+.atag{padding:3px 9px;border-radius:10px;font-size:12px;font-weight:600;background:var(--soft);border:1px solid var(--line);color:var(--ink);text-decoration:none}
+.memo{margin:0;font-size:14px;line-height:1.65;color:#4A556F;white-space:pre-wrap}
+.navgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px 20px}
 .btn2{height:48px;border-radius:14px;background:#fff;border:1px solid var(--line);font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:6px}
-.btn2:disabled{opacity:.4;cursor:default}
+.btn2:disabled{opacity:.35;cursor:default}
 .rows{padding:6px 20px 20px;display:flex;flex-direction:column;gap:10px}
-.rows h3{margin:0;font-size:15px;font-weight:800}
+.rows h3{margin:0 0 2px;font-size:16px;font-weight:800;letter-spacing:-.4px}
 .row{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;text-decoration:none;color:var(--ink)}
 .row.cur{border:2px solid var(--accent);padding:9px}
 .row .thumb{width:112px;flex:0 0 auto;aspect-ratio:16/9;border-radius:10px}
 .row div{display:flex;flex-direction:column;gap:4px;min-width:0}
-.row b{font-size:14px}
+.row b{font-size:14px;font-weight:700}
 .now{font-size:11px;font-weight:700;color:#fff;background:var(--accent);padding:2px 8px;border-radius:8px}
 .form{padding:8px 20px 0}
-.field{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;border:none;padding:0;min-width:0}
+.field{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;border:none;padding:0;min-width:0}
 .lab{font-size:14px;font-weight:700;padding:0;margin-bottom:0}
 .lab small{font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
 .inp{height:50px;padding:0 14px;border-radius:14px;border:1px solid var(--field);background:#fff;font:inherit;font-size:16px;color:var(--ink);width:100%}
+.inp:focus{outline:2px solid var(--ring);outline-offset:1px;border-color:var(--gold)}
 textarea.inp{height:auto;padding:12px 14px;resize:none}
 .inrow{display:flex;gap:8px}
 .inrow .inp{flex:1;min-width:0}
 .inrow button{flex:0 0 auto;height:50px;padding:0 16px;border-radius:14px;border:1px solid var(--field);background:var(--soft);font-weight:700;color:var(--ink)}
-.preview{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
+.preview{display:flex;gap:12px;align-items:center;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:10px}
 .preview .thumb{width:96px;aspect-ratio:16/9;border-radius:8px;flex:0 0 auto}
 .okmsg{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:#2D5E27}
 .err{color:#A33B12;font-size:13px;font-weight:700}
-.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--soft);padding:4px;border-radius:14px}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--soft);border:1px solid var(--line);padding:4px;border-radius:14px}
 .seg button{height:42px;border-radius:11px;border:none;background:transparent;font-size:14px;font-weight:700;color:var(--muted)}
-.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(42,36,32,.15)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(43,58,92,.14)}
 .wrapchips{display:flex;gap:8px;flex-wrap:wrap}
 .tchip{height:40px;padding:0 16px;border-radius:20px;font-size:14px;font-weight:700;background:#fff;color:var(--ink);border:1px solid var(--field)}
-.tchip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.tchip.acc{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tchip.on,.tchip.acc{background:var(--ink);color:#fff;border-color:var(--ink)}
 .tchip.add{border-style:dashed;background:transparent;color:var(--muted)}
-.foot{position:sticky;bottom:0;padding:16px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.foot{position:sticky;bottom:0;padding:16px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:rgba(255,255,255,.96);display:flex;flex-direction:column;gap:10px}
 .primary{width:100%;height:54px;border-radius:16px;border:none;background:var(--accent);color:#fff;font-size:16px;font-weight:800}
 .primary:disabled{opacity:.5;cursor:default}
 .danger{width:100%;height:46px;border-radius:14px;border:1px solid #E7C3B3;background:#fff;color:#A33B12;font-size:14px;font-weight:700}
 .login{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:84px 32px 40px;max-width:420px;margin:0 auto}
-.logo{width:84px;height:84px;border-radius:26px;background:var(--accent);display:flex;align-items:center;justify-content:center}
-.login h1{margin:22px 0 6px;font-size:24px;font-weight:800;letter-spacing:-.5px}
+.logo{width:84px;height:84px;border-radius:22px;box-shadow:var(--shadow)}
+.login h1{margin:24px 0 6px;font-size:26px;font-weight:800;letter-spacing:-.8px}
 .login p{margin:0;font-size:14px;color:var(--muted)}
-.dots{display:flex;gap:18px;margin:34px 0 10px}
-.dots span{width:16px;height:16px;border-radius:8px;border:2px solid #B9AA9B}
+.dots{display:flex;gap:18px;margin:36px 0 10px}
+.dots span{width:16px;height:16px;border-radius:8px;border:2px solid var(--ring)}
 .dots span.on{background:var(--ink);border-color:var(--ink)}
 .lmsg{height:20px;font-size:13px;font-weight:700;color:var(--muted)}
 .lmsg.bad{color:#A33B12}
 .keys{margin-top:auto;width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.keys button{height:68px;border-radius:20px;background:#fff;border:1px solid var(--line);font-size:26px;font-weight:700;color:var(--ink)}
-.keys button:active{background:var(--soft)}
+.keys button{height:68px;border-radius:20px;background:var(--soft);border:1px solid var(--line);font-size:26px;font-weight:600;color:var(--ink)}
+.keys button:active{background:#F1EADD}
 .keys .ghost{background:transparent;border:none;font-size:16px;color:var(--muted)}
 .keys .hide{visibility:hidden}
 .center{padding:80px 24px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:14px}
@@ -135,23 +141,20 @@ textarea.inp{height:auto;padding:12px 14px;resize:none}
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="config.js"></script>
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbyomqCk9krRwPWI-6mzCP9NkrgId2r38ZwBFD1ANvA_P9iNAv9FERlBAUoFq2mdyKtM/exec';
-
 const { useState, useEffect, useMemo } = React;
 const html = htm.bind(React.createElement);
 
 const WHO = ['아빠', '엄마', '이안', '이서'];
 const WHO_STYLE = { '아빠': ['#DCE7F3', '#1F4A78'], '엄마': ['#F8DCCB', '#8A3612'], '이안': ['#DDEFD9', '#2D5E27'], '이서': ['#E6DDF2', '#4E3A78'] };
-const DEFAULT_ALBUMS = ['생일', '여행', '명절', '학교 행사', '성장 기록'];
-const ALBUM_STYLE = {
-  '생일': ['#F8DCCB', 'M4 21h16M5 21v-8h14v8M12 13V9M10 6a2 2 0 0 0 4 0c0-1.5-2-3-2-3s-2 1.5-2 3z'],
-  '여행': ['#DCE7F3', 'M3 20h18M6 20l6-14 6 14M9 13h6'],
-  '명절': ['#F3E6C4', 'M4 10h16v10H4zM2 10l10-6 10 6M12 10v10'],
-  '학교 행사': ['#E6DDF2', 'M3 10l9-5 9 5-9 5zM7 12v5c3 2 7 2 10 0v-5'],
-  '성장 기록': ['#DDEFD9', 'M12 21V10M12 10c0-4 3-6 7-6 0 4-3 6-7 6zM12 14c0-3-2-5-6-5 0 3 2 5 6 5z']
+const DEFAULT_ALBUMS = ['여행', '일상', '기념일', '운동'];
+const ALBUM_ICON = {
+  '여행': 'M5 8h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1zM9 8V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V8M9 8v12M15 8v12',
+  '일상': 'M5 10h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 11h1.5a2.5 2.5 0 0 1 0 5H16M9 3.5v3M12.5 3.5v3',
+  '기념일': 'M4 11h16v9H4zM3 8h18v3H3zM12 8v12M12 8C10 4 6.5 4.5 7.5 7M12 8c2-4 5.5-3.5 4.5-1',
+  '운동': 'M6.5 7v10M17.5 7v10M3.5 10v4M20.5 10v4M6.5 12h11'
 };
-const ALBUM_ETC = ['#EFE6DC', 'M3 7h6l2 2h10v10H3z'];
 const TOKEN_KEY = 'fv_token';
 
 function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; } }
@@ -248,11 +251,12 @@ const Ico = {
   prev: html`<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 6 9 12 15 18"></polyline></svg>`,
   close: html`<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>`,
   edit: html`<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path><line x1="13.5" y1="6.5" x2="17.5" y2="10.5"></line></svg>`,
-  plus: html`<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.4" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
-  play: s => html`<svg aria-hidden="true" width=${s} height=${s} viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#FFFFFF" fillOpacity="0.92"></circle><polygon points="10,7.5 16.5,12 10,16.5" fill="#2A2420"></polygon></svg>`,
+  plus: html`<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.4" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+  play: s => html`<svg aria-hidden="true" width=${s} height=${s} viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#FFFFFF" fillOpacity="0.92"></circle><polygon points="10,7.5 16.5,12 10,16.5" fill="#2B3A5C"></polygon></svg>`,
+  playW: html`<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20" fill="#FFFFFF"></polygon></svg>`,
   shuffle: html`<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>`,
   check: html`<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D5E27" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="5 12 10 17 19 7"></polyline></svg>`,
-  cam: html`<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A3612" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"></rect><polygon points="16 10 21 7 21 17 16 14"></polygon></svg>`,
+  cam: html`<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2B3A5C" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"></rect><polygon points="16 10 21 7 21 17 16 14"></polygon></svg>`,
   house: html`<svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path><polygon points="10 11 15 14 10 17" fill="#FFFFFF"></polygon></svg>`
 };
 
@@ -304,23 +308,34 @@ function Login({ onOk }) {
     </div>`;
 }
 
+function AlbumIcon({ name }) {
+  const d = ALBUM_ICON[name] || 'M3 7h6l2 2h10v10H3z';
+  return html`<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2B3A5C" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d=${d}></path></svg>`;
+}
+
 function Home({ videos }) {
   const [shift, setShift] = useState(0);
   const mem = useMemo(() => pickMemory(videos, shift), [videos, shift]);
-  const albums = useMemo(() => {
-    const names = DEFAULT_ALBUMS.slice();
-    videos.forEach(v => v.albums.forEach(a => { if (names.indexOf(a) < 0) names.push(a); }));
-    return names.map(n => ({ name: n, count: videos.filter(v => v.albums.indexOf(n) >= 0).length }));
+  const albums = useMemo(() => DEFAULT_ALBUMS.map(n => ({ name: n, count: videos.filter(v => v.albums.indexOf(n) >= 0).length })), [videos]);
+  const extra = useMemo(() => {
+    const n = [];
+    videos.forEach(v => v.albums.forEach(a => { if (DEFAULT_ALBUMS.indexOf(a) < 0 && n.indexOf(a) < 0) n.push(a); }));
+    return n;
   }, [videos]);
   const years = useMemo(() => {
     const map = {};
     videos.forEach(v => { const y = P(v.date).y; if (!map[y]) map[y] = { year: y, count: 0, cover: v }; map[y].count++; });
     return Object.values(map).sort((a, b) => b.year - a.year);
   }, [videos]);
+  const t = today();
+  const dow = ['일', '월', '화', '수', '목', '금', '토'][new Date().getDay()];
 
   return html`
     <div className="wrap">
-      <header className="hdr"><h1>우리 가족 영상</h1></header>
+      <header className="top">
+        <div><small>${t.m}월 ${t.d}일 ${dow}요일</small><h1>우리 가족 영상</h1></div>
+        <img src="icon-192.png" alt="" />
+      </header>
 
       ${!mem ? html`
         <section className="sec">
@@ -332,45 +347,44 @@ function Home({ videos }) {
           </div>
         </section>` : html`
         <section className="sec">
-          <div className="sec-h"><h2>${mem.heading}</h2><span className="muted">${dateLabel(mem.v)}</span></div>
-          <a className="card" href=${'#/v/' + mem.v.id}>
-            <div className="thumb big" style=${bg(thumb(mem.v.youtubeId, 'hqdefault'))}>
-              ${Ico.play(52)}
-              <span className="tag">${mem.random ? '하루 동안 고정' : '추억 영상'}</span>
+          <a className="hero" href=${'#/v/' + mem.v.id}>
+            <div className="thumb" style=${bg(thumb(mem.v.youtubeId, 'hqdefault'))}>
+              <span className="hero-badge">${mem.random ? '오늘의 추억' : mem.heading}</span>
+              <span className="hero-play">${Ico.playW}</span>
             </div>
-            <div className="card-b">
+            <div className="hero-b">
               <b>${mem.v.title}</b>
-              <span className="muted">${(mem.v.who ? mem.v.who + '가 올림' : '') + (mem.note ? ' · ' + mem.note : '')}</span>
+              <span className="muted" style=${{ fontSize: '12px' }}>${[dateLabel(mem.v), mem.v.who ? mem.v.who + '가 올림' : '', mem.note].filter(Boolean).join(' · ')}</span>
             </div>
           </a>
           ${mem.random && videos.length > 1 ? html`<button className="shuffle" onClick=${() => setShift(shift + 1)}>${Ico.shuffle} 다른 추억 보기</button>` : null}
         </section>`}
 
-      <section style=${{ marginTop: '26px' }}>
-        <div className="sec-h" style=${{ padding: '0 20px' }}><h2>앨범</h2></div>
-        <div className="hscroll">
-          ${albums.map(a => {
-            const s = ALBUM_STYLE[a.name] || ALBUM_ETC;
-            return html`<a key=${a.name} className="album" href=${'#/album/' + encodeURIComponent(a.name)}>
-              <i style=${{ background: s[0] }}><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2420" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d=${s[1]}></path></svg></i>
-              <b>${a.name}</b><span className="muted" style=${{ fontSize: '12px' }}>영상 ${a.count}개</span>
-            </a>`;
-          })}
+      <section className="sec">
+        <div className="h2row"><h2>앨범</h2><i></i></div>
+        <div className="alb4">
+          ${albums.map(a => html`<a key=${a.name} className="alb" href=${'#/album/' + encodeURIComponent(a.name)}>
+            <i><${AlbumIcon} name=${a.name} /></i>
+            <b>${a.name}</b><span>${a.count}편</span>
+          </a>`)}
         </div>
+        ${extra.length ? html`<div className="morealb">
+          ${extra.map(a => html`<a key=${a} className="atag" href=${'#/album/' + encodeURIComponent(a)}>${a}</a>`)}
+        </div>` : null}
       </section>
 
       ${years.length ? html`
-        <section className="sec">
-          <div className="sec-h"><h2>연도별</h2><span className="muted">${years[years.length - 1].year} – ${years[0].year} · 총 ${videos.length}개</span></div>
-          <div className="grid2">
-            ${years.map(y => html`<a key=${y.year} className="ytile" href=${'#/year/' + y.year}>
-              <div className="ythumb" style=${bg(thumb(y.cover.youtubeId))}><span>${y.year}</span></div>
-              <div className="ytile-b"><span className="muted">영상 ${y.count}개</span>${Ico.next}</div>
+        <section style=${{ marginTop: '30px' }}>
+          <div className="h2row" style=${{ padding: '0 20px' }}><h2>지나온 해</h2><i></i><span className="muted" style=${{ fontSize: '12px' }}>총 ${videos.length}편</span></div>
+          <div className="hscroll">
+            ${years.map(y => html`<a key=${y.year} className="ycard" href=${'#/year/' + y.year}>
+              <span className="thumb" style=${bg(thumb(y.cover.youtubeId))}></span>
+              <div><b>${y.year}</b><span className="muted" style=${{ fontSize: '12px' }}>${y.count}편</span></div>
             </a>`)}
           </div>
         </section>` : null}
 
-      <a className="fab" href="#/new">${Ico.plus} 영상 등록</a>
+      <a className="fab" href="#/new" aria-label="영상 등록">${Ico.plus}</a>
     </div>`;
 }
 
@@ -403,7 +417,7 @@ function YearView({ videos, year }) {
     <div className="wrap" style=${{ paddingBottom: '24px' }}>
       <div className="bar">
         <a className="ib" href="#/" aria-label="홈으로">${Ico.back}</a>
-        <h1>${y}년</h1><span className="muted" style=${{ marginLeft: '6px' }}>영상 ${list.length}개</span>
+        <h1>${y}년</h1><span className="muted" style=${{ marginLeft: '6px' }}>${list.length}편</span>
       </div>
       <div className="chips">
         <button className="chip on" onClick=${() => window.scrollTo({ top: 0, behavior: 'smooth' })}>전체</button>
@@ -437,7 +451,7 @@ function AlbumView({ videos, name }) {
     <div className="wrap" style=${{ paddingBottom: '24px' }}>
       <div className="bar">
         <a className="ib" href="#/" aria-label="홈으로">${Ico.back}</a>
-        <h1>${name}</h1><span className="muted" style=${{ marginLeft: '6px' }}>영상 ${list.length}개</span>
+        <h1>${name}</h1><span className="muted" style=${{ marginLeft: '6px' }}>${list.length}편</span>
       </div>
       <div className="list full">
         ${!list.length ? html`<div className="center">이 앨범에는 아직 영상이 없어요</div>` : null}
@@ -471,6 +485,7 @@ function Player({ videos, id }) {
         <iframe key=${v.youtubeId} src=${'https://www.youtube-nocookie.com/embed/' + v.youtubeId + '?rel=0&playsinline=1'} title=${v.title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen></iframe>
       </div>
       <section className="info">
+        <small>${dateLabel(v)}</small>
         <h2>${v.title}</h2>
         <div className="meta">
           <${WhoBadge} who=${v.who} />
