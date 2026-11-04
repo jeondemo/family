@@ -8,6 +8,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="가족 영상">
 <title>우리 가족 영상</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
 <style>
@@ -133,7 +136,7 @@ textarea.inp{height:auto;padding:12px 14px;resize:none}
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbyomqCk9krRwPWI-6mzCP9NkrgId2r38ZwBFD1ANvA_P9iNAv9FERlBAUoFq2mdyKtM/exec';
+const API = 'GAS_웹앱_URL을_여기에_붙여넣기';
 
 const { useState, useEffect, useMemo } = React;
 const html = htm.bind(React.createElement);
@@ -286,7 +289,7 @@ function Login({ onOk }) {
   const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
   return html`
     <div className="login">
-      <span className="logo">${Ico.house}</span>
+      <img className="logo" src="icon-192.png" alt="" />
       <h1>우리 가족 영상</h1>
       <p>가족 비밀번호를 눌러주세요</p>
       <div className="dots" aria-label=${'입력 ' + pin.length + '자리'}>
@@ -685,6 +688,7 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {});
 </script>
 </body>
 </html>
