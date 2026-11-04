@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF7F2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="가족 영상">
+<title>우리 가족 영상</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<style>
+:root{--bg:#FBF7F2;--ink:#2A2420;--muted:#6B5F55;--line:#EADFD2;--soft:#F1E9DF;--accent:#B4491A;--field:#D8CBBE}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',sans-serif;-webkit-tap-highlight-color:transparent}
+a{color:var(--accent)}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:110px}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0}
+.hdr h1{font-size:22px;font-weight:800;letter-spacing:-.5px;margin:0}
+.bar{display:flex;align-items:center;gap:4px;padding:12px 12px 8px;position:sticky;top:0;background:var(--bg);z-index:5}
+.bar h1{font-size:20px;font-weight:800;margin:0;letter-spacing:-.5px}
+.bar .grow{flex:1}
+.ib{width:44px;height:44px;border:none;background:transparent;border-radius:22px;display:flex;align-items:center;justify-content:center;color:var(--ink);text-decoration:none;flex:0 0 auto}
+.sec{padding:0 20px;margin-top:26px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:10px}
+.sec-h h2{font-size:17px;font-weight:800;margin:0}
+.muted{color:var(--muted);font-size:13px}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;color:inherit;text-decoration:none}
+.thumb{position:relative;background:#E8DED3 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+.big{aspect-ratio:16/9}
+.tag{position:absolute;left:12px;top:12px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:10px}
+.card-b{padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.card-b b{font-size:16px}
+.shuffle{margin-top:10px;width:100%;height:46px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.hscroll{display:flex;gap:10px;overflow-x:auto;padding:0 20px;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
+.album{flex:0 0 112px;padding:14px;border-radius:16px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);background:#fff}
+.album i{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.album b{font-size:15px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ytile{text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.ythumb{height:76px;background:#6B5F55 center/cover no-repeat;position:relative;display:flex;align-items:flex-end;padding:0 12px 8px}
+.ythumb::after{content:'';position:absolute;inset:0;background:rgba(30,26,23,.42)}
+.ythumb span{position:relative;z-index:1;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.ytile-b{padding:9px 12px;display:flex;justify-content:space-between;align-items:center}
+.fab{position:fixed;right:max(20px,calc(50% - 220px));bottom:calc(28px + env(safe-area-inset-bottom));height:54px;padding:0 20px;border-radius:27px;background:var(--accent);color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;box-shadow:0 6px 16px rgba(42,36,32,.22);z-index:10}
+.empty{border:2px dashed var(--field);border-radius:20px;padding:28px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.empty i{width:56px;height:56px;border-radius:28px;background:#F8DCCB;display:flex;align-items:center;justify-content:center}
+.pill-btn{height:46px;padding:0 20px;border-radius:23px;background:var(--accent);color:#fff;text-decoration:none;display:inline-flex;align-items:center;font-size:14px;font-weight:700;border:none}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 56px 12px 20px;scrollbar-width:none;position:sticky;top:64px;background:var(--bg);z-index:4}
+.chips::-webkit-scrollbar{display:none}
+.chip{height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:700;flex:0 0 auto;color:var(--ink)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip:disabled{background:transparent;color:#8A7E73;border:1px dashed var(--field);cursor:default}
+.list{padding:4px 56px 20px 20px}
+.list.full{padding-right:20px}
+.mon{margin-bottom:22px}
+.mon-h{display:flex;gap:8px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:10px;scroll-margin-top:120px}
+.mon-h h2{font-size:17px;font-weight:800;margin:0}
+.vt{text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:5px;min-width:0}
+.vt .thumb{aspect-ratio:16/9;border-radius:12px}
+.vt b{font-size:13px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.day{position:absolute;left:6px;top:6px;background:#fff;color:var(--ink);font-size:11px;font-weight:700;padding:1px 7px;border-radius:8px}
+.scrub{position:fixed;right:max(6px,calc(50% - 234px));top:120px;bottom:24px;width:40px;display:flex;flex-direction:column;align-items:center;justify-content:space-around;background:var(--soft);border-radius:20px;touch-action:none;padding:8px 0;z-index:6}
+.scrub button{width:32px;min-height:22px;flex:1 1 auto;max-height:36px;border:none;background:transparent;border-radius:14px;font-size:11px;font-weight:700;color:var(--muted)}
+.scrub button.on{background:var(--accent);color:#fff}
+.video{width:100%;aspect-ratio:16/9;background:#1E1A17}
+.video iframe{width:100%;height:100%;border:0;display:block}
+.info{padding:18px 20px 14px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--line)}
+.info h2{margin:0;font-size:20px;font-weight:800;line-height:1.35}
+.meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.badge{padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700}
+.atag{padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--soft);color:var(--ink);text-decoration:none}
+.memo{margin:0;font-size:14px;line-height:1.6;color:#463C35;white-space:pre-wrap}
+.navgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 20px}
+.btn2{height:48px;border-radius:14px;background:#fff;border:1px solid var(--line);font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:6px}
+.btn2:disabled{opacity:.4;cursor:default}
+.rows{padding:6px 20px 20px;display:flex;flex-direction:column;gap:10px}
+.rows h3{margin:0;font-size:15px;font-weight:800}
+.row{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;text-decoration:none;color:var(--ink)}
+.row.cur{border:2px solid var(--accent);padding:9px}
+.row .thumb{width:112px;flex:0 0 auto;aspect-ratio:16/9;border-radius:10px}
+.row div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.row b{font-size:14px}
+.now{font-size:11px;font-weight:700;color:#fff;background:var(--accent);padding:2px 8px;border-radius:8px}
+.form{padding:8px 20px 0}
+.field{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;border:none;padding:0;min-width:0}
+.lab{font-size:14px;font-weight:700;padding:0;margin-bottom:0}
+.lab small{font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
+.inp{height:50px;padding:0 14px;border-radius:14px;border:1px solid var(--field);background:#fff;font:inherit;font-size:16px;color:var(--ink);width:100%}
+textarea.inp{height:auto;padding:12px 14px;resize:none}
+.inrow{display:flex;gap:8px}
+.inrow .inp{flex:1;min-width:0}
+.inrow button{flex:0 0 auto;height:50px;padding:0 16px;border-radius:14px;border:1px solid var(--field);background:var(--soft);font-weight:700;color:var(--ink)}
+.preview{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
+.preview .thumb{width:96px;aspect-ratio:16/9;border-radius:8px;flex:0 0 auto}
+.okmsg{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:#2D5E27}
+.err{color:#A33B12;font-size:13px;font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--soft);padding:4px;border-radius:14px}
+.seg button{height:42px;border-radius:11px;border:none;background:transparent;font-size:14px;font-weight:700;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(42,36,32,.15)}
+.wrapchips{display:flex;gap:8px;flex-wrap:wrap}
+.tchip{height:40px;padding:0 16px;border-radius:20px;font-size:14px;font-weight:700;background:#fff;color:var(--ink);border:1px solid var(--field)}
+.tchip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tchip.acc{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tchip.add{border-style:dashed;background:transparent;color:var(--muted)}
+.foot{position:sticky;bottom:0;padding:16px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.primary{width:100%;height:54px;border-radius:16px;border:none;background:var(--accent);color:#fff;font-size:16px;font-weight:800}
+.primary:disabled{opacity:.5;cursor:default}
+.danger{width:100%;height:46px;border-radius:14px;border:1px solid #E7C3B3;background:#fff;color:#A33B12;font-size:14px;font-weight:700}
+.login{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:84px 32px 40px;max-width:420px;margin:0 auto}
+.logo{width:84px;height:84px;border-radius:26px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.login h1{margin:22px 0 6px;font-size:24px;font-weight:800;letter-spacing:-.5px}
+.login p{margin:0;font-size:14px;color:var(--muted)}
+.dots{display:flex;gap:18px;margin:34px 0 10px}
+.dots span{width:16px;height:16px;border-radius:8px;border:2px solid #B9AA9B}
+.dots span.on{background:var(--ink);border-color:var(--ink)}
+.lmsg{height:20px;font-size:13px;font-weight:700;color:var(--muted)}
+.lmsg.bad{color:#A33B12}
+.keys{margin-top:auto;width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.keys button{height:68px;border-radius:20px;background:#fff;border:1px solid var(--line);font-size:26px;font-weight:700;color:var(--ink)}
+.keys button:active{background:var(--soft)}
+.keys .ghost{background:transparent;border:none;font-size:16px;color:var(--muted)}
+.keys .hide{visibility:hidden}
+.center{padding:80px 24px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:14px}
+</style>
+</head>
+<body>
+<div id="root"><div class="center">불러오는 중…</div></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+const API = 'GAS_웹앱_URL을_여기에_붙여넣기';
+
+const { useState, useEffect, useMemo } = React;
+const html = htm.bind(React.createElement);
+
+const WHO = ['아빠', '엄마', '이안', '이서'];
+const WHO_STYLE = { '아빠': ['#DCE7F3', '#1F4A78'], '엄마': ['#F8DCCB', '#8A3612'], '이안': ['#DDEFD9', '#2D5E27'], '이서': ['#E6DDF2', '#4E3A78'] };
+const DEFAULT_ALBUMS = ['생일', '여행', '명절', '학교 행사', '성장 기록'];
+const ALBUM_STYLE = {
+  '생일': ['#F8DCCB', 'M4 21h16M5 21v-8h14v8M12 13V9M10 6a2 2 0 0 0 4 0c0-1.5-2-3-2-3s-2 1.5-2 3z'],
+  '여행': ['#DCE7F3', 'M3 20h18M6 20l6-14 6 14M9 13h6'],
+  '명절': ['#F3E6C4', 'M4 10h16v10H4zM2 10l10-6 10 6M12 10v10'],
+  '학교 행사': ['#E6DDF2', 'M3 10l9-5 9 5-9 5zM7 12v5c3 2 7 2 10 0v-5'],
+  '성장 기록': ['#DDEFD9', 'M12 21V10M12 10c0-4 3-6 7-6 0 4-3 6-7 6zM12 14c0-3-2-5-6-5 0 3 2 5 6 5z']
+};
+const ALBUM_ETC = ['#EFE6DC', 'M3 7h6l2 2h10v10H3z'];
+const TOKEN_KEY = 'fv_token';
+
+function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; } }
+function saveToken(t) { try { if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); } catch (e) {} }
+
+async function api(action, payload) {
+  const res = await fetch(API, { method: 'POST', body: JSON.stringify(Object.assign({ action: action, token: getToken() }, payload || {})) });
+  const data = await res.json();
+  if (data && data.error === 'AUTH') { saveToken(''); window.dispatchEvent(new Event('fv-auth')); }
+  return data;
+}
+
+const thumb = (id, q) => 'https://i.ytimg.com/vi/' + id + '/' + (q || 'mqdefault') + '.jpg';
+const bg = url => ({ backgroundImage: 'url(' + url + ')' });
+const pad = n => String(n).padStart(2, '0');
+const P = d => { const a = String(d).split('-').map(Number); return { y: a[0], m: a[1], d: a[2] }; };
+const today = () => { const n = new Date(); return { y: n.getFullYear(), m: n.getMonth() + 1, d: n.getDate() }; };
+
+function dateLabel(v) {
+  const p = P(v.date);
+  if (v.precision === 'year') return p.y + '년';
+  if (v.precision === 'month') return p.y + '년 ' + p.m + '월';
+  return p.y + '년 ' + p.m + '월 ' + p.d + '일';
+}
+function dayChip(v) {
+  if (v.precision === 'day') return P(v.date).d + '일';
+  if (v.precision === 'month') return '날짜 모름';
+  return '';
+}
+function sortVideos(list) {
+  return list.slice().sort((a, b) => b.date.localeCompare(a.date) || String(b.createdAt).localeCompare(String(a.createdAt)));
+}
+function dayKey(v) { return v.date + '|' + v.precision; }
+
+function rng(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function dayDiff(v, t) {
+  const p = P(v.date);
+  let diff = Math.round((new Date(2000, p.m - 1, p.d) - new Date(2000, t.m - 1, t.d)) / 86400000);
+  if (diff > 183) diff -= 366;
+  if (diff < -183) diff += 366;
+  return diff;
+}
+function pickMemory(videos, shift) {
+  if (!videos.length) return null;
+  const t = today();
+  const r = rng(t.y * 10000 + t.m * 100 + t.d + shift * 7919);
+  const choose = arr => arr[Math.floor(r() * arr.length)];
+  const ago = v => t.y - P(v.date).y;
+  const past = videos.filter(v => P(v.date).y < t.y);
+  if (shift === 0) {
+    const same = past.filter(v => v.precision === 'day' && P(v.date).m === t.m && P(v.date).d === t.d);
+    if (same.length) {
+      const v = choose(same);
+      const n = videos.filter(x => x.date === v.date && x.precision === 'day').length;
+      return { v: v, heading: ago(v) + '년 전 오늘', note: n > 1 ? '이날 영상 ' + n + '개' : '' };
+    }
+    const near = past.filter(v => v.precision === 'day' && Math.abs(dayDiff(v, t)) <= 7);
+    if (near.length) {
+      const v = choose(near);
+      const d = dayDiff(v, t);
+      return { v: v, heading: ago(v) + '년 전 이맘때', note: d > 0 ? '오늘보다 ' + d + '일 뒤' : '오늘보다 ' + (-d) + '일 전' };
+    }
+    const mon = past.filter(v => v.precision !== 'year' && P(v.date).m === t.m);
+    if (mon.length) {
+      const v = choose(mon);
+      return { v: v, heading: ago(v) + '년 전 ' + t.m + '월', note: '' };
+    }
+  }
+  const v = choose(videos);
+  const a = ago(v);
+  return { v: v, heading: '오늘의 추억', note: a > 0 ? a + '년 전' : '', random: true };
+}
+
+function useHash() {
+  const read = () => location.hash.replace(/^#\/?/, '').split('/').map(decodeURIComponent);
+  const [h, setH] = useState(read());
+  useEffect(() => {
+    const f = () => setH(read());
+    window.addEventListener('hashchange', f);
+    return () => window.removeEventListener('hashchange', f);
+  }, []);
+  return h;
+}
+const Ico = {
+  back: html`<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 6 9 12 15 18"></polyline></svg>`,
+  next: html`<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"></polyline></svg>`,
+  prev: html`<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 6 9 12 15 18"></polyline></svg>`,
+  close: html`<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>`,
+  edit: html`<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path><line x1="13.5" y1="6.5" x2="17.5" y2="10.5"></line></svg>`,
+  plus: html`<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.4" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+  play: s => html`<svg aria-hidden="true" width=${s} height=${s} viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#FFFFFF" fillOpacity="0.92"></circle><polygon points="10,7.5 16.5,12 10,16.5" fill="#2A2420"></polygon></svg>`,
+  shuffle: html`<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>`,
+  check: html`<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D5E27" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="5 12 10 17 19 7"></polyline></svg>`,
+  cam: html`<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A3612" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"></rect><polygon points="16 10 21 7 21 17 16 14"></polygon></svg>`,
+  house: html`<svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path><polygon points="10 11 15 14 10 17" fill="#FFFFFF"></polygon></svg>`
+};
+
+function WhoBadge({ who }) {
+  const s = WHO_STYLE[who] || ['#EFE6DC', '#2A2420'];
+  return who ? html`<span className="badge" style=${{ background: s[0], color: s[1] }}>${who}</span>` : null;
+}
+
+function Login({ onOk }) {
+  const [pin, setPin] = useState('');
+  const [msg, setMsg] = useState('');
+  const [bad, setBad] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const submit = async p => {
+    setBusy(true); setBad(false); setMsg('확인 중…');
+    try {
+      const r = await api('login', { pin: p });
+      if (r.ok) { saveToken(r.token); onOk(r.token); return; }
+      setBad(true);
+      setMsg(r.error === 'LOCKED' ? '여러 번 틀렸어요. 10분 뒤에 다시 해주세요' : '비밀번호가 맞지 않아요');
+    } catch (e) {
+      setBad(true); setMsg('연결에 실패했어요. 인터넷을 확인해 주세요');
+    }
+    setPin(''); setBusy(false);
+  };
+  const press = k => {
+    if (busy) return;
+    if (k === 'del') { setPin(pin.slice(0, -1)); return; }
+    if (pin.length >= 4) return;
+    const p = pin + k;
+    setPin(p); setMsg(''); setBad(false);
+    if (p.length === 4) submit(p);
+  };
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
+  return html`
+    <div className="login">
+      <span className="logo">${Ico.house}</span>
+      <h1>우리 가족 영상</h1>
+      <p>가족 비밀번호를 눌러주세요</p>
+      <div className="dots" aria-label=${'입력 ' + pin.length + '자리'}>
+        ${[0, 1, 2, 3].map(i => html`<span key=${i} className=${i < pin.length ? 'on' : ''}></span>`)}
+      </div>
+      <span className=${'lmsg' + (bad ? ' bad' : '')} role="status">${msg}</span>
+      <div className="keys">
+        ${keys.map((k, i) => k === '' ? html`<button key=${i} className="hide" aria-hidden="true" tabIndex="-1"></button>`
+          : k === 'del' ? html`<button key=${i} className="ghost" aria-label="한 자리 지우기" onClick=${() => press('del')}>지움</button>`
+          : html`<button key=${i} onClick=${() => press(k)}>${k}</button>`)}
+      </div>
+    </div>`;
+}
+
+function Home({ videos }) {
+  const [shift, setShift] = useState(0);
+  const mem = useMemo(() => pickMemory(videos, shift), [videos, shift]);
+  const albums = useMemo(() => {
+    const names = DEFAULT_ALBUMS.slice();
+    videos.forEach(v => v.albums.forEach(a => { if (names.indexOf(a) < 0) names.push(a); }));
+    return names.map(n => ({ name: n, count: videos.filter(v => v.albums.indexOf(n) >= 0).length }));
+  }, [videos]);
+  const years = useMemo(() => {
+    const map = {};
+    videos.forEach(v => { const y = P(v.date).y; if (!map[y]) map[y] = { year: y, count: 0, cover: v }; map[y].count++; });
+    return Object.values(map).sort((a, b) => b.year - a.year);
+  }, [videos]);
+
+  return html`
+    <div className="wrap">
+      <header className="hdr"><h1>우리 가족 영상</h1></header>
+
+      ${!mem ? html`
+        <section className="sec">
+          <div className="empty">
+            <i>${Ico.cam}</i>
+            <b style=${{ fontSize: '16px' }}>아직 추억 영상이 없어요</b>
+            <span className="muted" style=${{ fontSize: '14px', lineHeight: 1.6 }}>옛날 영상을 촬영일과 함께 등록하면<br/>매일 이 자리에 추억을 보여드려요.</span>
+            <a className="pill-btn" href="#/new">옛날 영상 등록하기</a>
+          </div>
+        </section>` : html`
+        <section className="sec">
+          <div className="sec-h"><h2>${mem.heading}</h2><span className="muted">${dateLabel(mem.v)}</span></div>
+          <a className="card" href=${'#/v/' + mem.v.id}>
+            <div className="thumb big" style=${bg(thumb(mem.v.youtubeId, 'hqdefault'))}>
+              ${Ico.play(52)}
+              <span className="tag">${mem.random ? '하루 동안 고정' : '추억 영상'}</span>
+            </div>
+            <div className="card-b">
+              <b>${mem.v.title}</b>
+              <span className="muted">${(mem.v.who ? mem.v.who + '가 올림' : '') + (mem.note ? ' · ' + mem.note : '')}</span>
+            </div>
+          </a>
+          ${mem.random && videos.length > 1 ? html`<button className="shuffle" onClick=${() => setShift(shift + 1)}>${Ico.shuffle} 다른 추억 보기</button>` : null}
+        </section>`}
+
+      <section style=${{ marginTop: '26px' }}>
+        <div className="sec-h" style=${{ padding: '0 20px' }}><h2>앨범</h2></div>
+        <div className="hscroll">
+          ${albums.map(a => {
+            const s = ALBUM_STYLE[a.name] || ALBUM_ETC;
+            return html`<a key=${a.name} className="album" href=${'#/album/' + encodeURIComponent(a.name)}>
+              <i style=${{ background: s[0] }}><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2420" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d=${s[1]}></path></svg></i>
+              <b>${a.name}</b><span className="muted" style=${{ fontSize: '12px' }}>영상 ${a.count}개</span>
+            </a>`;
+          })}
+        </div>
+      </section>
+
+      ${years.length ? html`
+        <section className="sec">
+          <div className="sec-h"><h2>연도별</h2><span className="muted">${years[years.length - 1].year} – ${years[0].year} · 총 ${videos.length}개</span></div>
+          <div className="grid2">
+            ${years.map(y => html`<a key=${y.year} className="ytile" href=${'#/year/' + y.year}>
+              <div className="ythumb" style=${bg(thumb(y.cover.youtubeId))}><span>${y.year}</span></div>
+              <div className="ytile-b"><span className="muted">영상 ${y.count}개</span>${Ico.next}</div>
+            </a>`)}
+          </div>
+        </section>` : null}
+
+      <a className="fab" href="#/new">${Ico.plus} 영상 등록</a>
+    </div>`;
+}
+
+function Tile({ v, chip }) {
+  const c = chip === undefined ? dayChip(v) : chip;
+  return html`<a className="vt" href=${'#/v/' + v.id}>
+    <div className="thumb" style=${bg(thumb(v.youtubeId))}>
+      ${Ico.play(24)}
+      ${c ? html`<span className="day">${c}</span>` : null}
+    </div>
+    <b>${v.title}</b>
+  </a>`;
+}
+
+function YearView({ videos, year }) {
+  const y = Number(year);
+  const list = videos.filter(v => P(v.date).y === y);
+  const allYears = useMemo(() => Array.from(new Set(videos.map(v => P(v.date).y))).sort((a, b) => b - a), [videos]);
+  const groups = {};
+  list.forEach(v => { const k = v.precision === 'year' ? 0 : P(v.date).m; (groups[k] = groups[k] || []).push(v); });
+  const order = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].filter(k => groups[k]);
+  const jump = k => { const el = document.getElementById('m-' + k); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  const onTouch = e => {
+    const t = e.touches[0];
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const yy = el && el.getAttribute && el.getAttribute('data-year');
+    if (yy && Number(yy) !== y) location.replace('#/year/' + yy);
+  };
+  return html`
+    <div className="wrap" style=${{ paddingBottom: '24px' }}>
+      <div className="bar">
+        <a className="ib" href="#/" aria-label="홈으로">${Ico.back}</a>
+        <h1>${y}년</h1><span className="muted" style=${{ marginLeft: '6px' }}>영상 ${list.length}개</span>
+      </div>
+      <div className="chips">
+        <button className="chip on" onClick=${() => window.scrollTo({ top: 0, behavior: 'smooth' })}>전체</button>
+        ${[12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map(m => html`<button key=${m} className="chip" disabled=${!groups[m]} onClick=${() => jump(m)}>${m}월</button>`)}
+        ${groups[0] ? html`<button className="chip" onClick=${() => jump(0)}>월 모름</button>` : null}
+      </div>
+      <div className="list">
+        ${!list.length ? html`<div className="center">이 해에는 영상이 없어요</div>` : null}
+        ${order.map(k => html`<section key=${k} className="mon">
+          <div className="mon-h" id=${'m-' + k}><h2>${k ? k + '월' : '월 모름'}</h2><span className="muted">${groups[k].length}개</span></div>
+          <div className="grid2">${groups[k].map(v => html`<${Tile} key=${v.id} v=${v} />`)}</div>
+        </section>`)}
+      </div>
+      <nav className="scrub" aria-label="연도 이동" onTouchMove=${onTouch}>
+        ${allYears.map(yy => html`<button key=${yy} data-year=${yy} className=${yy === y ? 'on' : ''} onClick=${() => location.replace('#/year/' + yy)}>'${String(yy).slice(2)}</button>`)}
+      </nav>
+    </div>`;
+}
+
+function AlbumView({ videos, name }) {
+  const list = videos.filter(v => v.albums.indexOf(name) >= 0);
+  const groups = [];
+  list.forEach(v => {
+    const p = P(v.date);
+    const key = v.precision === 'year' ? p.y + '년' : p.y + '년 ' + p.m + '월';
+    let g = groups[groups.length - 1];
+    if (!g || g.key !== key) { g = { key: key, items: [] }; groups.push(g); }
+    g.items.push(v);
+  });
+  return html`
+    <div className="wrap" style=${{ paddingBottom: '24px' }}>
+      <div className="bar">
+        <a className="ib" href="#/" aria-label="홈으로">${Ico.back}</a>
+        <h1>${name}</h1><span className="muted" style=${{ marginLeft: '6px' }}>영상 ${list.length}개</span>
+      </div>
+      <div className="list full">
+        ${!list.length ? html`<div className="center">이 앨범에는 아직 영상이 없어요</div>` : null}
+        ${groups.map(g => html`<section key=${g.key} className="mon">
+          <div className="mon-h"><h2>${g.key}</h2><span className="muted">${g.items.length}개</span></div>
+          <div className="grid2">${g.items.map(v => html`<${Tile} key=${v.id} v=${v} />`)}</div>
+        </section>`)}
+      </div>
+    </div>`;
+}
+
+function Player({ videos, id }) {
+  const v = videos.find(x => x.id === id);
+  if (!v) return html`<div className="center">영상을 찾을 수 없어요<a className="pill-btn" href="#/">홈으로</a></div>`;
+  const keys = [];
+  videos.forEach(x => { const k = dayKey(x); if (keys.indexOf(k) < 0) keys.push(k); });
+  const idx = keys.indexOf(dayKey(v));
+  const firstOf = k => videos.find(x => dayKey(x) === k);
+  const older = idx + 1 < keys.length ? firstOf(keys[idx + 1]) : null;
+  const newer = idx > 0 ? firstOf(keys[idx - 1]) : null;
+  const same = videos.filter(x => dayKey(x) === dayKey(v));
+  const y = P(v.date).y;
+  return html`
+    <div className="wrap" style=${{ paddingBottom: '24px' }}>
+      <div className="bar">
+        <a className="ib" href=${'#/year/' + y} aria-label="목록으로">${Ico.back}</a>
+        <h1 className="grow" style=${{ fontSize: '16px', fontWeight: 700 }}>${dateLabel(v)}</h1>
+        <a className="ib" href=${'#/edit/' + v.id} aria-label="수정">${Ico.edit}</a>
+      </div>
+      <div className="video">
+        <iframe key=${v.youtubeId} src=${'https://www.youtube-nocookie.com/embed/' + v.youtubeId + '?rel=0&playsinline=1'} title=${v.title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen></iframe>
+      </div>
+      <section className="info">
+        <h2>${v.title}</h2>
+        <div className="meta">
+          <${WhoBadge} who=${v.who} />
+          ${v.albums.map(a => html`<a key=${a} className="atag" href=${'#/album/' + encodeURIComponent(a)}>${a}</a>`)}
+        </div>
+        ${v.memo ? html`<p className="memo">${v.memo}</p>` : null}
+      </section>
+      <nav className="navgrid">
+        <button className="btn2" disabled=${!older} onClick=${() => older && location.replace('#/v/' + older.id)}>${Ico.prev} 이전 날</button>
+        <button className="btn2" disabled=${!newer} onClick=${() => newer && location.replace('#/v/' + newer.id)}>다음 날 ${Ico.next}</button>
+      </nav>
+      ${same.length > 1 ? html`<section className="rows">
+        <h3>같은 날 다른 영상</h3>
+        ${same.map(x => html`<a key=${x.id} className=${'row' + (x.id === v.id ? ' cur' : '')} href=${'#/v/' + x.id} onClick=${e => { e.preventDefault(); location.replace('#/v/' + x.id); }}>
+          <span className="thumb" style=${bg(thumb(x.youtubeId))}>${x.id === v.id ? html`<span className="now">재생 중</span>` : Ico.play(22)}</span>
+          <div><b>${x.title}</b><span className="muted" style=${{ fontSize: '12px' }}>${x.who || ''}</span></div>
+        </a>`)}
+      </section>` : null}
+    </div>`;
+}
+
+function Upload({ videos, editId, onSaved }) {
+  const ed = editId ? videos.find(x => x.id === editId) : null;
+  const t = today();
+  const p0 = ed ? P(ed.date) : t;
+  const [url, setUrl] = useState(ed ? 'https://youtu.be/' + ed.youtubeId : '');
+  const [yid, setYid] = useState(ed ? ed.youtubeId : '');
+  const [check, setCheck] = useState(ed ? { ok: true, text: '영상 확인됨' } : null);
+  const [checking, setChecking] = useState(false);
+  const [title, setTitle] = useState(ed ? ed.title : '');
+  const [mode, setMode] = useState(ed ? ed.precision : 'day');
+  const [day, setDay] = useState(ed && ed.precision === 'day' ? ed.date : t.y + '-' + pad(t.m) + '-' + pad(t.d));
+  const [yy, setYy] = useState(p0.y);
+  const [mm, setMm] = useState(p0.m);
+  const [who, setWho] = useState(ed ? ed.who : '');
+  const [albums, setAlbums] = useState(ed ? ed.albums.slice() : []);
+  const [adding, setAdding] = useState(false);
+  const [newAlbum, setNewAlbum] = useState('');
+  const [memo, setMemo] = useState(ed ? ed.memo : '');
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState('');
+
+  if (editId && !ed) return html`<div className="center">영상을 찾을 수 없어요<a className="pill-btn" href="#/">홈으로</a></div>`;
+
+  const allAlbums = (() => {
+    const n = DEFAULT_ALBUMS.slice();
+    videos.forEach(v => v.albums.forEach(a => { if (n.indexOf(a) < 0) n.push(a); }));
+    albums.forEach(a => { if (n.indexOf(a) < 0) n.push(a); });
+    return n;
+  })();
+  const yearOpts = [];
+  for (let i = t.y; i >= 1980; i--) yearOpts.push(i);
+
+  const doCheck = async () => {
+    if (!url.trim()) return;
+    setChecking(true); setCheck(null);
+    try {
+      const r = await api('check', { url: url });
+      if (r.ok) {
+        setYid(r.youtubeId);
+        setCheck({ ok: true, text: '영상 확인됨' });
+        if (!title.trim() && r.title) setTitle(r.title.slice(0, 100));
+      } else {
+        setYid('');
+        setCheck({ ok: false, text: r.error === 'BAD_URL' ? '유튜브 링크 형식이 아니에요' : r.error === 'PRIVATE' ? '비공개 영상이에요. 유튜브에서 "일부공개"로 바꿔주세요' : '영상을 찾을 수 없어요' });
+      }
+    } catch (e) {
+      setCheck({ ok: false, text: '확인에 실패했어요. 인터넷을 확인해 주세요' });
+    }
+    setChecking(false);
+  };
+  const toggleAlbum = a => setAlbums(albums.indexOf(a) >= 0 ? albums.filter(x => x !== a) : albums.concat([a]));
+  const addAlbum = () => {
+    const n = newAlbum.trim().replace(/,/g, ' ').slice(0, 20);
+    if (n && albums.indexOf(n) < 0) setAlbums(albums.concat([n]));
+    setNewAlbum(''); setAdding(false);
+  };
+  const dateValue = () => mode === 'day' ? day : mode === 'month' ? yy + '-' + pad(mm) + '-01' : yy + '-01-01';
+
+  const save = async () => {
+    setErr('');
+    if (!yid) { setErr('유튜브 링크를 먼저 확인해 주세요'); return; }
+    if (!title.trim()) { setErr('제목을 입력해 주세요'); return; }
+    if (mode === 'day' && !/^\d{4}-\d{2}-\d{2}$/.test(day)) { setErr('촬영 날짜를 골라주세요'); return; }
+    if (!who) { setErr('올린 사람을 골라주세요'); return; }
+    setSaving(true);
+    try {
+      const video = { id: editId || '', youtubeId: yid, title: title.trim(), date: dateValue(), precision: mode, who: who, albums: albums, memo: memo.trim() };
+      const r = await api(editId ? 'update' : 'add', { video: video });
+      if (!r.ok) { setErr(r.error || '저장에 실패했어요'); setSaving(false); return; }
+      await onSaved();
+      location.replace('#/v/' + r.id);
+    } catch (e) {
+      setErr('저장에 실패했어요. 인터넷을 확인해 주세요');
+      setSaving(false);
+    }
+  };
+  const remove = async () => {
+    if (!confirm('이 영상을 목록에서 지울까요?\n(유튜브에 올린 영상은 그대로 남아요)')) return;
+    setSaving(true);
+    try {
+      const r = await api('remove', { id: editId });
+      if (!r.ok) { setErr('삭제에 실패했어요'); setSaving(false); return; }
+      await onSaved();
+      location.replace('#/');
+    } catch (e) { setErr('삭제에 실패했어요'); setSaving(false); }
+  };
+
+  return html`
+    <div className="wrap" style=${{ paddingBottom: 0 }}>
+      <div className="bar">
+        <a className="ib" href=${ed ? '#/v/' + ed.id : '#/'} aria-label="닫기">${Ico.close}</a>
+        <h1>${ed ? '영상 수정' : '영상 등록'}</h1>
+      </div>
+      <div className="form">
+        <div className="field">
+          <label className="lab" htmlFor="yt">유튜브 링크</label>
+          <div className="inrow">
+            <input id="yt" className="inp" type="url" inputMode="url" placeholder="https://youtu.be/..." value=${url}
+              onChange=${e => { setUrl(e.target.value); setCheck(null); setYid(''); }} onBlur=${doCheck} />
+            <button type="button" onClick=${doCheck} disabled=${checking}>${checking ? '확인 중' : '확인'}</button>
+          </div>
+          ${check && check.ok && yid ? html`<div className="preview">
+            <span className="thumb" style=${bg(thumb(yid))}></span>
+            <span className="okmsg">${Ico.check} ${check.text}</span>
+          </div>` : null}
+          ${check && !check.ok ? html`<span className="err">${check.text}</span>` : null}
+        </div>
+
+        <div className="field">
+          <label className="lab" htmlFor="ttl">제목</label>
+          <input id="ttl" className="inp" type="text" maxLength="100" value=${title} onChange=${e => setTitle(e.target.value)} />
+        </div>
+
+        <fieldset className="field">
+          <legend className="lab" style=${{ marginBottom: '8px' }}>촬영일</legend>
+          <div className="seg">
+            ${[['day', '정확한 날짜'], ['month', '연도·월만'], ['year', '연도만']].map(m => html`<button key=${m[0]} type="button" className=${mode === m[0] ? 'on' : ''} onClick=${() => setMode(m[0])}>${m[1]}</button>`)}
+          </div>
+          ${mode === 'day' ? html`<input className="inp" type="date" aria-label="촬영 날짜" value=${day} max=${t.y + '-' + pad(t.m) + '-' + pad(t.d)} onChange=${e => setDay(e.target.value)} />` : null}
+          ${mode !== 'day' ? html`<div className="inrow">
+            <select className="inp" aria-label="연도" value=${yy} onChange=${e => setYy(Number(e.target.value))}>${yearOpts.map(o => html`<option key=${o} value=${o}>${o}년</option>`)}</select>
+            ${mode === 'month' ? html`<select className="inp" aria-label="월" value=${mm} onChange=${e => setMm(Number(e.target.value))}>${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(o => html`<option key=${o} value=${o}>${o}월</option>`)}</select>` : null}
+          </div>` : null}
+          <span className="muted" style=${{ fontSize: '12px' }}>정확한 날짜를 모르면 연도와 월까지만 넣어도 됩니다.</span>
+        </fieldset>
+
+        <fieldset className="field">
+          <legend className="lab" style=${{ marginBottom: '8px' }}>올린 사람</legend>
+          <div className="wrapchips">
+            ${WHO.map(w => html`<button key=${w} type="button" className=${'tchip' + (who === w ? ' on' : '')} onClick=${() => setWho(w)}>${w}</button>`)}
+          </div>
+        </fieldset>
+
+        <fieldset className="field">
+          <legend className="lab" style=${{ marginBottom: '8px' }}>앨범<small>여러 개 선택 가능</small></legend>
+          <div className="wrapchips">
+            ${allAlbums.map(a => html`<button key=${a} type="button" className=${'tchip' + (albums.indexOf(a) >= 0 ? ' acc' : '')} onClick=${() => toggleAlbum(a)}>${a}</button>`)}
+            ${adding ? null : html`<button type="button" className="tchip add" onClick=${() => setAdding(true)}>+ 새 앨범</button>`}
+          </div>
+          ${adding ? html`<div className="inrow">
+            <input className="inp" type="text" maxLength="20" aria-label="새 앨범 이름" placeholder="예: 캠핑" value=${newAlbum} onChange=${e => setNewAlbum(e.target.value)} onKeyDown=${e => { if (e.key === 'Enter') { e.preventDefault(); addAlbum(); } }} />
+            <button type="button" onClick=${addAlbum}>추가</button>
+          </div>` : null}
+        </fieldset>
+
+        <div className="field">
+          <label className="lab" htmlFor="memo">메모<small>선택</small></label>
+          <textarea id="memo" className="inp" rows="3" maxLength="500" value=${memo} onChange=${e => setMemo(e.target.value)}></textarea>
+        </div>
+      </div>
+      <div className="foot">
+        ${err ? html`<span className="err">${err}</span>` : null}
+        <button className="primary" type="button" disabled=${saving} onClick=${save}>${saving ? '저장 중…' : ed ? '수정 저장' : '등록하기'}</button>
+        ${ed ? html`<button className="danger" type="button" disabled=${saving} onClick=${remove}>목록에서 삭제</button>` : null}
+      </div>
+    </div>`;
+}
+
+function App() {
+  const [token, setTok] = useState(getToken());
+  const [videos, setVideos] = useState(null);
+  const [err, setErr] = useState('');
+  const route = useHash();
+
+  const load = async () => {
+    setErr('');
+    try {
+      const r = await api('list');
+      if (r.ok) setVideos(sortVideos(r.videos));
+      else if (r.error !== 'AUTH') setErr('목록을 불러오지 못했어요 (' + r.error + ')');
+    } catch (e) {
+      setErr('목록을 불러오지 못했어요. 인터넷을 확인해 주세요');
+    }
+  };
+  useEffect(() => {
+    const f = () => { setTok(''); setVideos(null); };
+    window.addEventListener('fv-auth', f);
+    return () => window.removeEventListener('fv-auth', f);
+  }, []);
+  useEffect(() => { if (token) load(); }, [token]);
+  useEffect(() => { window.scrollTo(0, 0); }, [route.join('/')]);
+
+  if (!token) return html`<${Login} onOk=${tk => setTok(tk)} />`;
+  if (err) return html`<div className="center">${err}<button className="pill-btn" onClick=${load}>다시 시도</button></div>`;
+  if (!videos) return html`<div className="center">불러오는 중…</div>`;
+
+  const [page, arg] = route;
+  if (page === 'year') return html`<${YearView} key=${arg} videos=${videos} year=${arg} />`;
+  if (page === 'album') return html`<${AlbumView} videos=${videos} name=${arg} />`;
+  if (page === 'v') return html`<${Player} key=${arg} videos=${videos} id=${arg} />`;
+  if (page === 'new') return html`<${Upload} key="new" videos=${videos} onSaved=${load} />`;
+  if (page === 'edit') return html`<${Upload} key=${'e' + arg} videos=${videos} editId=${arg} onSaved=${load} />`;
+  return html`<${Home} videos=${videos} />`;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
+</script>
+</body>
+</html>
