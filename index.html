@@ -572,7 +572,96 @@ function fmtLen(sec) {
   return (h ? h + ':' + pad(m) : m) + ':' + pad(x);
 }
 
-function Sync({ pending, reload }) {
+function frameHash(b64) {
+  return new Promise(resolve => {
+    if (!b64) return resolve(null);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        c.width = 9; c.height = 8;
+        const x = c.getContext('2d');
+        x.drawImage(img, 0, Math.round(img.height * 0.13), img.width, Math.round(img.height * 0.74), 0, 0, 9, 8);
+        const d = x.getImageData(0, 0, 9, 8).data;
+        const g = [];
+        for (let i = 0; i < 72; i++) g.push(d[i * 4] * 0.299 + d[i * 4 + 1] * 0.587 + d[i * 4 + 2] * 0.114);
+        const mean = g.reduce((a, b) => a + b, 0) / 72;
+        const sd = Math.sqrt(g.reduce((a, b) => a + (b - mean) * (b - mean), 0) / 72);
+        if (sd < 6) return resolve(null);
+        let bits = '';
+        for (let r = 0; r < 8; r++) for (let k = 0; k < 8; k++) bits += g[r * 9 + k] > g[r * 9 + k + 1] ? '1' : '0';
+        resolve(bits);
+      } catch (e) { resolve(null); }
+    };
+    img.onerror = () => resolve(null);
+    img.src = 'data:image/jpeg;base64,' + b64;
+  });
+}
+function hashGet(id) { try { const v = localStorage.getItem('fv_h_' + id); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+function hashSet(id, h) { try { localStorage.setItem('fv_h_' + id, JSON.stringify(h)); } catch (e) {} }
+function sceneScore(a, b) {
+  if (!a || !b) return 0;
+  const sims = [];
+  for (let i = 0; i < 3; i++) {
+    if (!a[i] || !b[i]) continue;
+    let h = 0;
+    for (let k = 0; k < 64; k++) if (a[i][k] !== b[i][k]) h++;
+    sims.push(1 - h / 64);
+  }
+  if (sims.length < 2 || sims.some(x => x < 0.86)) return 0;
+  return sims.reduce((x, y) => x + y, 0) / sims.length;
+}
+
+function useSceneDupes(pending) {
+  const [st, setSt] = useState({ groups: [], checking: false });
+  useEffect(() => {
+    let dead = false;
+    const pairs = pending && !pending.error && pending.scenePairs ? pending.scenePairs : [];
+    if (!pairs.length) { setSt({ groups: [], checking: false }); return; }
+    setSt(s => ({ groups: s.groups, checking: true }));
+    (async () => {
+      const ids = Array.from(new Set([].concat.apply([], pairs)));
+      const hashes = {};
+      const need = [];
+      ids.forEach(id => { const c = hashGet(id); if (c) hashes[id] = c; else need.push(id); });
+      for (let i = 0; i < need.length; i += 40) {
+        let r;
+        try { r = await api('frames', { ids: need.slice(i, i + 40) }); } catch (e) { break; }
+        if (dead) return;
+        if (!r || !r.ok) break;
+        for (const id of Object.keys(r.frames)) {
+          const hs = await Promise.all(r.frames[id].map(frameHash));
+          hashes[id] = hs;
+          if (r.frames[id].every(Boolean)) hashSet(id, hs);
+        }
+      }
+      if (dead) return;
+      const parent = {};
+      const find = x => parent[x] === undefined || parent[x] === x ? x : (parent[x] = find(parent[x]));
+      const best = {};
+      pairs.forEach(([a, b]) => {
+        const sc = sceneScore(hashes[a], hashes[b]);
+        if (!sc) return;
+        const ra = find(a), rb = find(b);
+        parent[a] = parent[a] || a; parent[b] = parent[b] || b;
+        if (ra !== rb) parent[rb] = ra;
+        const root = find(a);
+        best[root] = Math.max(best[root] || 0, sc, best[rb] || 0);
+      });
+      const groups = {};
+      Object.keys(parent).forEach(id => { const r = find(id); (groups[r] = groups[r] || []).push(pending.sceneMeta[id]); });
+      const out = Object.keys(groups).filter(r => groups[r].length > 1).map(r => ({
+        reason: '같은 길이 · 장면 일치 (' + Math.round((best[r] || 0.9) * 100) + '%)',
+        items: groups[r].filter(Boolean)
+      }));
+      setSt({ groups: out, checking: false });
+    })();
+    return () => { dead = true; };
+  }, [pending]);
+  return st;
+}
+
+function Sync({ pending, reload, scene }) {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState('new');
   const [working, setWorking] = useState('');
@@ -627,7 +716,7 @@ function Sync({ pending, reload }) {
   if (pending.error) return html`<div className="wrap">${bar}<div className="center">
     ${pending.error === 'YT_OFF' ? 'Apps Script에서 YouTube 서비스를 켜야 사용할 수 있어요' : '유튜브 채널을 확인하지 못했어요'}
     <button className="pill-btn" onClick=${refresh}>다시 시도</button></div></div>`;
-  const dupes = pending.dupes || [];
+  const dupes = (pending.dupes || []).concat(scene && scene.groups ? scene.groups : []);
   const pct = pending.total ? Math.round(pending.done / pending.total * 100) : 100;
   const p = P(pending.from);
   return html`
@@ -661,7 +750,8 @@ function Sync({ pending, reload }) {
         </div>` : html`
         <p className="muted" style=${{ margin: '16px 20px 0', lineHeight: 1.6 }}>썸네일을 누르면 바로 재생돼요. 중복이 아니면 '제외'를 눌러 미등록 목록으로 보내고, 필요 없는 복사본은 '유튜브에서 삭제'를 누르세요.</p>
         <div style=${{ padding: '16px 20px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          ${!dupes.length ? html`<div className="center" style=${{ padding: '40px 0' }}>중복으로 보이는 영상이 없어요</div>` : null}
+          ${scene && scene.checking ? html`<div className="muted" style=${{ fontSize: '12px' }}>길이가 같은 영상의 장면을 비교하는 중이에요…</div>` : null}
+          ${!dupes.length && !(scene && scene.checking) ? html`<div className="center" style=${{ padding: '40px 0' }}>중복으로 보이는 영상이 없어요</div>` : null}
           ${dupes.map((g, gi) => html`<section key=${gi} className="dgroup">
             <div className="dgroup-h">${g.reason}<span>${g.items.length}개</span></div>
             ${g.kind === 'same' ? g.items.map(v => html`<div key=${v.rowId} className="dbox">
@@ -916,6 +1006,7 @@ function App() {
   const [err, setErr] = useState('');
   const [pending, setPending] = useState(null);
   const route = useHash();
+  const scene = useSceneDupes(pending);
 
   const loadPending = async alsoList => {
     if (alsoList) await load();
@@ -956,7 +1047,7 @@ function App() {
   if (page === 'v') return html`<${Player} key=${arg} videos=${videos} id=${arg} />`;
   if (page === 'new') return html`<${Upload} key="new" videos=${videos} onSaved=${afterSave} />`;
   if (page === 'edit') return html`<${Upload} key=${'e' + arg} videos=${videos} editId=${arg} onSaved=${afterSave} />`;
-  if (page === 'sync') return html`<${Sync} pending=${pending} reload=${loadPending} />`;
+  if (page === 'sync') return html`<${Sync} pending=${pending} reload=${loadPending} scene=${scene} />`;
   return html`<${Home} videos=${videos} pending=${pending && !pending.error ? pending : null} />`;
 }
 
