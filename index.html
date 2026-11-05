@@ -590,6 +590,16 @@ function Sync({ pending, reload }) {
     } catch (e) { alert('제외하지 못했어요. 인터넷을 확인해 주세요'); }
     setWorking('');
   };
+  const removeRow = async v => {
+    if (!confirm('앱 목록에서 이 줄 하나만 지울까요?\n(같은 영상의 다른 줄과 유튜브 영상은 그대로 남아요)')) return;
+    setWorking(v.rowId);
+    try {
+      const r = await api('remove', { id: v.rowId });
+      if (!r.ok) alert('지우지 못했어요');
+      await reload(true);
+    } catch (e) { alert('지우지 못했어요. 인터넷을 확인해 주세요'); }
+    setWorking('');
+  };
   const doDelete = async () => {
     const v = delTarget;
     setDelTarget(null);
@@ -654,7 +664,15 @@ function Sync({ pending, reload }) {
           ${!dupes.length ? html`<div className="center" style=${{ padding: '40px 0' }}>중복으로 보이는 영상이 없어요</div>` : null}
           ${dupes.map((g, gi) => html`<section key=${gi} className="dgroup">
             <div className="dgroup-h">${g.reason}<span>${g.items.length}개</span></div>
-            ${g.items.map(v => {
+            ${g.kind === 'same' ? g.items.map(v => html`<div key=${v.rowId} className="dbox">
+                <div className="dline">
+                  <a className="thumb" style=${bg(thumb(v.youtubeId))} href=${'#/v/' + v.rowId} aria-label=${v.title + ' 보기'}>${Ico.play(22)}</a>
+                  <div><b>${v.title}</b><small>${dateLabel(v)}${v.who ? ' · ' + v.who : ''}</small></div>
+                </div>
+                <div className="dbtns" style=${{ gridTemplateColumns: '1fr' }}>
+                  <button className="del" onClick=${() => removeRow(v)} disabled=${!!working}>${working === v.rowId ? '…' : '앱에서 이 줄 지우기'}</button>
+                </div>
+              </div>`) : g.items.map(v => {
               const state = (v.duration ? fmtLen(v.duration) + ' · ' : '') + (v.registered ? '앱에 등록됨' : '미등록');
               const btns = html`<div className="dbtns">
                 <button onClick=${() => exclude(v)} disabled=${!!working}>${working === v.youtubeId ? '…' : '제외'}</button>
@@ -801,7 +819,7 @@ function Upload({ videos, editId, onSaved }) {
     try {
       const video = { id: editId || '', youtubeId: yid, title: title.trim(), date: dateValue(), precision: mode, who: who, albums: albums, memo: memo.trim() };
       const r = await api(editId ? 'update' : 'add', { video: video });
-      if (!r.ok) { setErr(r.error || '저장에 실패했어요'); setSaving(false); return; }
+      if (!r.ok) { setErr(r.error === 'ALREADY' ? '이미 앱에 등록된 영상이에요' : (r.error || '저장에 실패했어요')); setSaving(false); return; }
       await onSaved();
       location.replace('#/v/' + r.id);
     } catch (e) {
