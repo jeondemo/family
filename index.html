@@ -147,6 +147,18 @@ textarea.inp{height:auto;padding:12px 14px;resize:none}
 .prow div{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
 .prow b{font-size:14px;font-weight:700;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .prow button{height:36px;padding:0 14px;flex:0 0 auto;border-radius:18px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700}
+.dgroup{border:1px solid var(--ring);border-radius:18px;overflow:hidden}
+.dgroup-h{background:var(--soft);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700}
+.dgroup-h span{font-size:12px;color:var(--gold)}
+.drow{display:flex;gap:12px;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}
+.drow .thumb{width:96px;aspect-ratio:16/9;flex:0 0 auto;border-radius:9px;text-decoration:none}
+.drow .len{position:absolute;right:4px;bottom:4px;background:#1E1A17;color:#fff;font-size:10px;padding:1px 5px;border-radius:5px}
+.drow div{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.drow b{font-size:13px;font-weight:700;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.drow small{font-size:12px;font-weight:600;color:var(--muted)}
+.drow small.on{color:#2D5E27}
+.drow button{height:34px;padding:0 12px;flex:0 0 auto;border-radius:17px;font-size:12px;font-weight:700;border:1px solid var(--field);background:#fff;color:var(--muted)}
+.drow button.reg{border:none;background:var(--accent);color:#fff}
 .center{padding:80px 24px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:14px}
 </style>
 </head>
@@ -530,10 +542,31 @@ function Player({ videos, id }) {
     </div>`;
 }
 
+function fmtLen(sec) {
+  if (!sec) return '';
+  const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), x = sec % 60;
+  return (h ? h + ':' + pad(m) : m) + ':' + pad(x);
+}
+
 function Sync({ pending, reload }) {
   const [busy, setBusy] = useState(false);
+  const [tab, setTab] = useState('new');
+  const [working, setWorking] = useState('');
   const refresh = async () => { setBusy(true); await reload(); setBusy(false); };
   const go = v => { PREFILL = { youtubeId: v.youtubeId, title: v.title }; location.hash = '#/new'; };
+  const exclude = async v => {
+    const msg = v.registered
+      ? '이 영상은 앱에 이미 등록되어 있어요.\n앱에서 지우고 목록에서도 제외할까요?\n(유튜브 영상은 그대로 남아요)'
+      : '이 영상을 목록에서 제외할까요?\n(유튜브 영상은 그대로 남아요)';
+    if (!confirm(msg)) return;
+    setWorking(v.youtubeId);
+    try {
+      const r = await api('ignore', { youtubeId: v.youtubeId });
+      if (!r.ok) alert('제외하지 못했어요');
+      await reload(true);
+    } catch (e) { alert('제외하지 못했어요. 인터넷을 확인해 주세요'); }
+    setWorking('');
+  };
   const bar = html`
     <div className="bar">
       <a className="ib" href="#/" aria-label="홈으로">${Ico.back}</a>
@@ -544,33 +577,55 @@ function Sync({ pending, reload }) {
   if (pending.error) return html`<div className="wrap">${bar}<div className="center">
     ${pending.error === 'YT_OFF' ? 'Apps Script에서 YouTube 서비스를 켜야 사용할 수 있어요' : '유튜브 채널을 확인하지 못했어요'}
     <button className="pill-btn" onClick=${refresh}>다시 시도</button></div></div>`;
+  const dupes = pending.dupes || [];
   const pct = pending.total ? Math.round(pending.done / pending.total * 100) : 100;
   const p = P(pending.from);
   return html`
     <div className="wrap" style=${{ paddingBottom: '30px' }}>
       ${bar}
-      <div className="syncbox">
-        <div style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+      <div className="seg" style=${{ gridTemplateColumns: 'repeat(2,minmax(0,1fr))', margin: '4px 20px 0' }}>
+        <button className=${tab === 'new' ? 'on' : ''} onClick=${() => setTab('new')}>미등록 ${pending.pending.length}</button>
+        <button className=${tab === 'dup' ? 'on' : ''} onClick=${() => setTab('dup')}>중복 의심 ${dupes.length}묶음</button>
+      </div>
+
+      ${tab === 'new' ? html`
+        <div className="syncbox" style=${{ marginTop: '14px' }}>
           <b style=${{ fontSize: '14px' }}>${p.y}년 ${p.m}월 ${p.d}일 이후 올린 영상 ${pending.total}개 중</b>
+          <div className="syncbar"><div style=${{ width: pct + '%' }}></div></div>
+          <div className="synccnt">
+            <span><b>${pending.done}</b> 앱에 등록됨</span>
+            <span style=${{ color: 'var(--gold)' }}><b>${pending.pending.length}</b> 아직 안 올림</span>
+          </div>
         </div>
-        <div className="syncbar"><div style=${{ width: pct + '%' }}></div></div>
-        <div className="synccnt">
-          <span><b>${pending.done}</b> 앱에 등록됨</span>
-          <span style=${{ color: 'var(--gold)' }}><b>${pending.pending.length}</b> 아직 안 올림</span>
-        </div>
-      </div>
-      <div className="sec" style=${{ marginTop: '22px' }}>
-        <div className="h2row"><h2>아직 앱에 없는 영상</h2><i></i><span className="muted" style=${{ fontSize: '12px' }}>최근 올린 순</span></div>
-        ${!pending.pending.length ? html`<div className="center" style=${{ padding: '40px 0' }}>모두 등록했어요</div>` : null}
-        <div style=${{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          ${pending.pending.map(v => html`<div key=${v.youtubeId} className="prow">
-            <span className="thumb" style=${bg(thumb(v.youtubeId))}></span>
-            <div><b>${v.title}</b><span className="muted" style=${{ fontSize: '12px' }}>유튜브 업로드 ${P(v.uploadedAt).m}월 ${P(v.uploadedAt).d}일</span></div>
-            <button onClick=${() => go(v)}>등록</button>
-          </div>`)}
-        </div>
-        ${pending.pending.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6, marginTop: '18px' }}>'등록'을 누르면 링크와 제목이 채워진 등록 화면이 열립니다. 촬영일과 앨범만 고르면 끝납니다.</p>` : null}
-      </div>
+        <div className="sec" style=${{ marginTop: '22px' }}>
+          <div className="h2row"><h2>아직 앱에 없는 영상</h2><i></i><span className="muted" style=${{ fontSize: '12px' }}>최근 올린 순</span></div>
+          ${!pending.pending.length ? html`<div className="center" style=${{ padding: '40px 0' }}>모두 등록했어요</div>` : null}
+          <div style=${{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            ${pending.pending.map(v => html`<div key=${v.youtubeId} className="prow">
+              <span className="thumb" style=${bg(thumb(v.youtubeId))}></span>
+              <div><b>${v.title}</b><span className="muted" style=${{ fontSize: '12px' }}>유튜브 업로드 ${P(v.uploadedAt).m}월 ${P(v.uploadedAt).d}일${v.duration ? ' · ' + fmtLen(v.duration) : ''}</span></div>
+              <button onClick=${() => go(v)}>등록</button>
+            </div>`)}
+          </div>
+          ${pending.pending.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6, marginTop: '18px' }}>'등록'을 누르면 링크와 제목이 채워진 등록 화면이 열립니다. 촬영일과 앨범만 고르면 끝납니다.</p>` : null}
+        </div>` : html`
+        <p className="muted" style=${{ margin: '16px 20px 0', lineHeight: 1.6 }}>길이가 같고(±1초) 제목이나 날짜가 비슷한 영상끼리 묶었어요. 남길 영상 하나만 두고 나머지는 '제외'하면 목록에서 빠집니다.</p>
+        <div style=${{ padding: '18px 20px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          ${!dupes.length ? html`<div className="center" style=${{ padding: '40px 0' }}>중복으로 보이는 영상이 없어요</div>` : null}
+          ${dupes.map((g, gi) => html`<section key=${gi} className="dgroup">
+            <div className="dgroup-h">${g.reason}<span>${g.items.length}개</span></div>
+            ${g.items.map(v => html`<div key=${v.youtubeId} className="drow">
+              <a className="thumb" style=${bg(thumb(v.youtubeId))} href=${'https://studio.youtube.com/video/' + v.youtubeId + '/edit'} target="_blank" rel="noopener" aria-label="유튜브 스튜디오에서 열기">
+                ${v.duration ? html`<span className="len">${fmtLen(v.duration)}</span>` : null}
+              </a>
+              <div><b>${v.title}</b><small className=${v.registered ? 'on' : ''}>${v.registered ? '앱에 등록됨' : '미등록'}</small></div>
+              ${!v.registered && !g.items.some(x => x.registered)
+                ? html`<button className="reg" onClick=${() => go(v)} disabled=${!!working}>등록</button>` : null}
+              <button onClick=${() => exclude(v)} disabled=${!!working}>${working === v.youtubeId ? '…' : '제외'}</button>
+            </div>`)}
+          </section>`)}
+          ${dupes.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6 }}>'제외'는 앱 목록에서만 빼는 것이고 유튜브 영상은 그대로 남아요. 썸네일을 누르면 유튜브 스튜디오가 열려서 거기서 바로 지울 수도 있어요.</p>` : null}
+        </div>`}
     </div>`;
 }
 
@@ -782,7 +837,8 @@ function App() {
   const [pending, setPending] = useState(null);
   const route = useHash();
 
-  const loadPending = async () => {
+  const loadPending = async alsoList => {
+    if (alsoList) await load();
     try {
       const r = await api('pending');
       setPending(r.ok ? r : { error: r.error || 'FAIL', pending: [] });
