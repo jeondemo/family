@@ -574,6 +574,35 @@ function Sync({ pending, reload }) {
     </div>`;
 }
 
+function parseTitleDate(raw) {
+  const str = String(raw || '').trim();
+  const now = today();
+  const fullYear = y => y.length === 4 ? Number(y) : (Number(y) <= now.y % 100 ? 2000 + Number(y) : 1900 + Number(y));
+  const valid = (y, m, d) => {
+    if (y < 1950 || y > now.y || m < 1 || m > 12 || (y === now.y && m > now.m)) return false;
+    if (d === undefined) return true;
+    const dt = new Date(y, m - 1, d);
+    return dt.getMonth() === m - 1 && dt.getDate() === d && dt <= new Date();
+  };
+  const done = (match, y, m, d, precision) => {
+    const rest = str.slice(match.length).replace(/^[\s.\-_/,~:)\]]+/, '').trim();
+    const date = y + '-' + pad(m || 1) + '-' + pad(d || 1);
+    return { precision: precision, date: date, y: y, m: m || 1, rest: rest || str, label: match.trim() };
+  };
+  let r = str.match(/^(\d{4}|\d{2})\s*[.\-/년\s]\s*(\d{1,2})\s*[.\-/월\s]\s*(\d{1,2})\s*일?(?=[\s.\-_/,)\]]|$)/);
+  if (r) { const y = fullYear(r[1]), m = Number(r[2]), d = Number(r[3]); if (valid(y, m, d)) return done(r[0], y, m, d, 'day'); }
+  r = str.match(/^(\d{8}|\d{6})(?=[\s.\-_/,)\]]|$)/);
+  if (r) {
+    const n = r[1], y = fullYear(n.slice(0, n.length - 4)), m = Number(n.slice(-4, -2)), d = Number(n.slice(-2));
+    if (valid(y, m, d)) return done(r[0], y, m, d, 'day');
+  }
+  r = str.match(/^(\d{4}|\d{2})\s*(?:년\s*|[.\-/]\s*|\s+)(\d{1,2})\s*월(?=[\s.\-_/,)\]]|$)/) || str.match(/^(\d{4}|\d{2})[.\-/](\d{1,2})(?=[\s_,)\]]|$)/);
+  if (r) { const y = fullYear(r[1]), m = Number(r[2]); if (valid(y, m)) return done(r[0], y, m, undefined, 'month'); }
+  r = str.match(/^(\d{4})\s*년?(?=[\s.\-_/,)\]]|$)/);
+  if (r) { const y = Number(r[1]); if (valid(y, 1)) return done(r[0], y, 1, undefined, 'year'); }
+  return null;
+}
+
 function Upload({ videos, editId, onSaved }) {
   const ed = editId ? videos.find(x => x.id === editId) : null;
   const [pre] = useState(() => { const x = editId ? null : PREFILL; PREFILL = null; return x; });
@@ -583,11 +612,23 @@ function Upload({ videos, editId, onSaved }) {
   const [yid, setYid] = useState(ed ? ed.youtubeId : pre ? pre.youtubeId : '');
   const [check, setCheck] = useState(ed || pre ? { ok: true, text: '영상 확인됨' } : null);
   const [checking, setChecking] = useState(false);
-  const [title, setTitle] = useState(ed ? ed.title : pre ? pre.title.slice(0, 100) : '');
-  const [mode, setMode] = useState(ed ? ed.precision : 'day');
-  const [day, setDay] = useState(ed && ed.precision === 'day' ? ed.date : t.y + '-' + pad(t.m) + '-' + pad(t.d));
-  const [yy, setYy] = useState(p0.y);
-  const [mm, setMm] = useState(p0.m);
+  const [pd0] = useState(() => pre ? parseTitleDate(pre.title) : null);
+  const [title, setTitle] = useState(ed ? ed.title : pre ? (pd0 ? pd0.rest : pre.title).slice(0, 100) : '');
+  const [mode, setMode] = useState(ed ? ed.precision : pd0 ? pd0.precision : 'day');
+  const [day, setDay] = useState(ed && ed.precision === 'day' ? ed.date : pd0 && pd0.precision === 'day' ? pd0.date : t.y + '-' + pad(t.m) + '-' + pad(t.d));
+  const [yy, setYy] = useState(pd0 ? pd0.y : p0.y);
+  const [mm, setMm] = useState(pd0 ? pd0.m : p0.m);
+  const [auto, setAuto] = useState(pd0 ? pd0.label : '');
+  const [touched, setTouched] = useState(false);
+  const applyTitle = raw => {
+    const p = ed || touched ? null : parseTitleDate(raw);
+    if (!p) return false;
+    setMode(p.precision);
+    if (p.precision === 'day') setDay(p.date);
+    setYy(p.y); setMm(p.m); setAuto(p.label);
+    setTitle(p.rest.slice(0, 100));
+    return true;
+  };
   const [who, setWho] = useState(ed ? ed.who : '');
   const [albums, setAlbums] = useState(ed ? ed.albums.slice() : []);
   const [adding, setAdding] = useState(false);
@@ -615,7 +656,7 @@ function Upload({ videos, editId, onSaved }) {
       if (r.ok) {
         setYid(r.youtubeId);
         setCheck({ ok: true, text: '영상 확인됨' });
-        if (!title.trim() && r.title) setTitle(r.title.slice(0, 100));
+        if (!title.trim() && r.title && !applyTitle(r.title)) setTitle(r.title.slice(0, 100));
       } else {
         setYid('');
         setCheck({ ok: false, text: r.error === 'BAD_URL' ? '유튜브 링크 형식이 아니에요' : r.error === 'PRIVATE' ? '비공개 영상이에요. 유튜브에서 "일부공개"로 바꿔주세요' : '영상을 찾을 수 없어요' });
@@ -685,20 +726,21 @@ function Upload({ videos, editId, onSaved }) {
 
         <div className="field">
           <label className="lab" htmlFor="ttl">제목</label>
-          <input id="ttl" className="inp" type="text" maxLength="100" value=${title} onChange=${e => setTitle(e.target.value)} />
+          <input id="ttl" className="inp" type="text" maxLength="100" value=${title} onChange=${e => setTitle(e.target.value)} onBlur=${e => applyTitle(e.target.value)} />
         </div>
 
         <fieldset className="field">
           <legend className="lab" style=${{ marginBottom: '8px' }}>촬영일</legend>
           <div className="seg">
-            ${[['day', '정확한 날짜'], ['month', '연도·월만'], ['year', '연도만']].map(m => html`<button key=${m[0]} type="button" className=${mode === m[0] ? 'on' : ''} onClick=${() => setMode(m[0])}>${m[1]}</button>`)}
+            ${[['day', '정확한 날짜'], ['month', '연도·월만'], ['year', '연도만']].map(m => html`<button key=${m[0]} type="button" className=${mode === m[0] ? 'on' : ''} onClick=${() => { setMode(m[0]); setTouched(true); setAuto(''); }}>${m[1]}</button>`)}
           </div>
-          ${mode === 'day' ? html`<input className="inp" type="date" aria-label="촬영 날짜" value=${day} max=${t.y + '-' + pad(t.m) + '-' + pad(t.d)} onChange=${e => setDay(e.target.value)} />` : null}
+          ${mode === 'day' ? html`<input className="inp" type="date" aria-label="촬영 날짜" value=${day} max=${t.y + '-' + pad(t.m) + '-' + pad(t.d)} onChange=${e => { setDay(e.target.value); setTouched(true); setAuto(''); }} />` : null}
           ${mode !== 'day' ? html`<div className="inrow">
-            <select className="inp" aria-label="연도" value=${yy} onChange=${e => setYy(Number(e.target.value))}>${yearOpts.map(o => html`<option key=${o} value=${o}>${o}년</option>`)}</select>
-            ${mode === 'month' ? html`<select className="inp" aria-label="월" value=${mm} onChange=${e => setMm(Number(e.target.value))}>${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(o => html`<option key=${o} value=${o}>${o}월</option>`)}</select>` : null}
+            <select className="inp" aria-label="연도" value=${yy} onChange=${e => { setYy(Number(e.target.value)); setTouched(true); setAuto(''); }}>${yearOpts.map(o => html`<option key=${o} value=${o}>${o}년</option>`)}</select>
+            ${mode === 'month' ? html`<select className="inp" aria-label="월" value=${mm} onChange=${e => { setMm(Number(e.target.value)); setTouched(true); setAuto(''); }}>${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(o => html`<option key=${o} value=${o}>${o}월</option>`)}</select>` : null}
           </div>` : null}
-          <span className="muted" style=${{ fontSize: '12px' }}>정확한 날짜를 모르면 연도와 월까지만 넣어도 됩니다.</span>
+          ${auto ? html`<span className="okmsg" style=${{ fontSize: '12px', fontWeight: 600 }}>${Ico.check} 제목의 "${auto}"에서 촬영일을 맞췄어요</span>`
+            : html`<span className="muted" style=${{ fontSize: '12px' }}>정확한 날짜를 모르면 연도와 월까지만 넣어도 됩니다.</span>`}
         </fieldset>
 
         <fieldset className="field">
