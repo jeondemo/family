@@ -171,7 +171,7 @@ textarea.inp{height:auto;padding:12px 14px;resize:none}
 .dplay iframe{width:100%;height:100%;border:0;display:block}
 .dmeta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:10px}
 .dmeta b{font-size:14px}
-.dbtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}
+.dbtns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:10px}
 .dbtns button{height:36px;border-radius:12px;font-size:13px;font-weight:700;border:1px solid var(--field);background:#fff;color:var(--muted)}
 .dbtns button.reg{border:none;background:var(--accent);color:#fff}
 .dbtns button.del{border-color:#E7C3B3;color:#A33B12}
@@ -581,14 +581,11 @@ function Sync({ pending, reload }) {
   const refresh = async () => { setBusy(true); await reload(); setBusy(false); };
   const go = v => { PREFILL = { youtubeId: v.youtubeId, title: v.title }; location.hash = '#/new'; };
   const exclude = async v => {
-    const msg = v.registered
-      ? '이 영상은 앱에 이미 등록되어 있어요.\n앱에서 지우고 목록에서도 제외할까요?\n(유튜브 영상은 그대로 남아요)'
-      : '이 영상을 목록에서 제외할까요?\n(유튜브 영상은 그대로 남아요)';
-    if (!confirm(msg)) return;
     setWorking(v.youtubeId);
     try {
-      const r = await api('ignore', { youtubeId: v.youtubeId });
+      const r = await api('notdupe', { youtubeId: v.youtubeId });
       if (!r.ok) alert('제외하지 못했어요');
+      if (playing === v.youtubeId) setPlaying('');
       await reload(true);
     } catch (e) { alert('제외하지 못했어요. 인터넷을 확인해 주세요'); }
     setWorking('');
@@ -652,16 +649,14 @@ function Sync({ pending, reload }) {
           </div>
           ${pending.pending.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6, marginTop: '18px' }}>'등록'을 누르면 링크와 제목이 채워진 등록 화면이 열립니다. 촬영일과 앨범만 고르면 끝납니다.</p>` : null}
         </div>` : html`
-        <p className="muted" style=${{ margin: '16px 20px 0', lineHeight: 1.6 }}>썸네일을 누르면 바로 재생돼요. 두 영상을 번갈아 보고 남길 것을 고르세요.</p>
+        <p className="muted" style=${{ margin: '16px 20px 0', lineHeight: 1.6 }}>썸네일을 누르면 바로 재생돼요. 중복이 아니면 '제외'를 눌러 미등록 목록으로 보내고, 필요 없는 복사본은 '유튜브에서 삭제'를 누르세요.</p>
         <div style=${{ padding: '16px 20px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           ${!dupes.length ? html`<div className="center" style=${{ padding: '40px 0' }}>중복으로 보이는 영상이 없어요</div>` : null}
           ${dupes.map((g, gi) => html`<section key=${gi} className="dgroup">
             <div className="dgroup-h">${g.reason}<span>${g.items.length}개</span></div>
             ${g.items.map(v => {
-              const anyReg = g.items.some(x => x.registered);
               const state = (v.duration ? fmtLen(v.duration) + ' · ' : '') + (v.registered ? '앱에 등록됨' : '미등록');
               const btns = html`<div className="dbtns">
-                <button className="reg" onClick=${() => go(v)} disabled=${!!working || v.registered || anyReg}>${v.registered ? '등록됨' : '등록'}</button>
                 <button onClick=${() => exclude(v)} disabled=${!!working}>${working === v.youtubeId ? '…' : '제외'}</button>
                 <button className="del" onClick=${() => setDelTarget(v)} disabled=${!!working}>유튜브에서 삭제</button>
               </div>`;
@@ -681,7 +676,7 @@ function Sync({ pending, reload }) {
               </div>`;
             })}
           </section>`)}
-          ${dupes.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6 }}>'제외'는 앱 목록에서만 빼고 유튜브 영상은 남겨요. '유튜브에서 삭제'는 유튜브 채널에서 영상을 완전히 지워요.</p>` : null}
+          ${dupes.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6 }}>'제외'는 중복 검사에서만 빼는 것이라 영상은 미등록 목록에 그대로 남아요. '유튜브에서 삭제'는 유튜브 채널에서 영상을 완전히 지워요.</p>` : null}
         </div>`}
       ${delTarget ? html`<div className="modal-bg" onClick=${e => { if (e.target === e.currentTarget) setDelTarget(null); }}>
         <div className="modal" role="dialog" aria-modal="true">
