@@ -460,11 +460,11 @@ function Tile({ v, chip }) {
 
 function YearView({ videos, year }) {
   const y = Number(year);
-  const list = videos.filter(v => P(v.date).y === y);
+  const list = videos.filter(v => P(v.date).y === y).slice().reverse();
   const allYears = useMemo(() => Array.from(new Set(videos.map(v => P(v.date).y))).sort((a, b) => b - a), [videos]);
   const groups = {};
   list.forEach(v => { const k = v.precision === 'year' ? 0 : P(v.date).m; (groups[k] = groups[k] || []).push(v); });
-  const order = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].filter(k => groups[k]);
+  const order = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0].filter(k => groups[k]);
   const jump = k => { const el = document.getElementById('m-' + k); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
   const onTouch = e => {
     const t = e.touches[0];
@@ -480,7 +480,7 @@ function YearView({ videos, year }) {
       </div>
       <div className="chips">
         <button className="chip on" onClick=${() => window.scrollTo({ top: 0, behavior: 'smooth' })}>전체</button>
-        ${[12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map(m => html`<button key=${m} className="chip" disabled=${!groups[m]} onClick=${() => jump(m)}>${m}월</button>`)}
+        ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => html`<button key=${m} className="chip" disabled=${!groups[m]} onClick=${() => jump(m)}>${m}월</button>`)}
         ${groups[0] ? html`<button className="chip" onClick=${() => jump(0)}>월 모름</button>` : null}
       </div>
       <div className="list">
