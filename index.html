@@ -658,7 +658,7 @@ function Sync({ pending, reload }) {
               const state = (v.duration ? fmtLen(v.duration) + ' · ' : '') + (v.registered ? '앱에 등록됨' : '미등록');
               const btns = html`<div className="dbtns">
                 <button onClick=${() => exclude(v)} disabled=${!!working}>${working === v.youtubeId ? '…' : '제외'}</button>
-                <button className="del" onClick=${() => setDelTarget(v)} disabled=${!!working}>유튜브에서 삭제</button>
+                ${v.old ? html`<button disabled>예전 영상</button>` : html`<button className="del" onClick=${() => setDelTarget(v)} disabled=${!!working}>유튜브에서 삭제</button>`}
               </div>`;
               return playing === v.youtubeId ? html`<div key=${v.youtubeId} className="dbox">
                 <div className="dplay"><iframe src=${'https://www.youtube-nocookie.com/embed/' + v.youtubeId + '?autoplay=1&rel=0&playsinline=1'} title=${v.title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen></iframe></div>
