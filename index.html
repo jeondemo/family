@@ -159,6 +159,30 @@ textarea.inp{height:auto;padding:12px 14px;resize:none}
 .drow small.on{color:#2D5E27}
 .drow button{height:34px;padding:0 12px;flex:0 0 auto;border-radius:17px;font-size:12px;font-weight:700;border:1px solid var(--field);background:#fff;color:var(--muted)}
 .drow button.reg{border:none;background:var(--accent);color:#fff}
+.dbox{border-top:1px solid var(--line);padding:12px}
+.dline{display:flex;gap:12px;align-items:center}
+.dline .thumb{width:96px;aspect-ratio:16/9;flex:0 0 auto;border-radius:9px;border:none;padding:0;cursor:pointer}
+.dline .len{position:absolute;right:4px;bottom:4px;background:#1E1A17;color:#fff;font-size:10px;padding:1px 5px;border-radius:5px}
+.dline div{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.dline b{font-size:13px;font-weight:700;line-height:1.35}
+.dline small{font-size:12px;font-weight:600;color:var(--muted)}
+.dline small.on{color:#2D5E27}
+.dplay{border-radius:12px;overflow:hidden;background:#111;aspect-ratio:16/9}
+.dplay iframe{width:100%;height:100%;border:0;display:block}
+.dmeta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:10px}
+.dmeta b{font-size:14px}
+.dbtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}
+.dbtns button{height:36px;border-radius:12px;font-size:13px;font-weight:700;border:1px solid var(--field);background:#fff;color:var(--muted)}
+.dbtns button.reg{border:none;background:var(--accent);color:#fff}
+.dbtns button.del{border-color:#E7C3B3;color:#A33B12}
+.dbtns button:disabled{opacity:.4;cursor:default}
+.modal-bg{position:fixed;inset:0;background:rgba(20,24,36,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:20px}
+.modal{width:100%;max-width:440px;background:#fff;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:10px;box-shadow:0 14px 30px rgba(43,58,92,.2);margin-bottom:env(safe-area-inset-bottom)}
+.modal b{font-size:16px;color:#A33B12}
+.modal p{margin:0;font-size:14px;line-height:1.6;color:#4A556F}
+.modal .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:6px}
+.modal .two button{height:46px;border-radius:12px;font-size:15px;font-weight:700;border:1px solid var(--field);background:#fff;color:var(--ink)}
+.modal .two button.go{border:none;background:#A33B12;color:#fff}
 .center{padding:80px 24px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:14px}
 </style>
 </head>
@@ -552,6 +576,8 @@ function Sync({ pending, reload }) {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState('new');
   const [working, setWorking] = useState('');
+  const [playing, setPlaying] = useState('');
+  const [delTarget, setDelTarget] = useState(null);
   const refresh = async () => { setBusy(true); await reload(); setBusy(false); };
   const go = v => { PREFILL = { youtubeId: v.youtubeId, title: v.title }; location.hash = '#/new'; };
   const exclude = async v => {
@@ -565,6 +591,23 @@ function Sync({ pending, reload }) {
       if (!r.ok) alert('제외하지 못했어요');
       await reload(true);
     } catch (e) { alert('제외하지 못했어요. 인터넷을 확인해 주세요'); }
+    setWorking('');
+  };
+  const doDelete = async () => {
+    const v = delTarget;
+    setDelTarget(null);
+    setWorking(v.youtubeId);
+    try {
+      const r = await api('deleteYT', { youtubeId: v.youtubeId });
+      if (!r.ok) {
+        alert(r.error === 'NO_PERMISSION' ? '유튜브 삭제 권한이 없어요. Apps Script에서 권한을 다시 허용해 주세요'
+          : r.error === 'TOO_OLD' ? '기준 날짜 이전에 올린 영상은 앱에서 지울 수 없어요'
+          : r.error === 'NOT_MINE' ? '내 채널 영상이 아니라서 지울 수 없어요'
+          : '삭제하지 못했어요 (' + r.error + ')');
+      }
+      if (playing === v.youtubeId) setPlaying('');
+      await reload(true);
+    } catch (e) { alert('삭제하지 못했어요. 인터넷을 확인해 주세요'); }
     setWorking('');
   };
   const bar = html`
@@ -609,23 +652,47 @@ function Sync({ pending, reload }) {
           </div>
           ${pending.pending.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6, marginTop: '18px' }}>'등록'을 누르면 링크와 제목이 채워진 등록 화면이 열립니다. 촬영일과 앨범만 고르면 끝납니다.</p>` : null}
         </div>` : html`
-        <p className="muted" style=${{ margin: '16px 20px 0', lineHeight: 1.6 }}>길이가 같고(±1초) 제목이나 날짜가 비슷한 영상끼리 묶었어요. 남길 영상 하나만 두고 나머지는 '제외'하면 목록에서 빠집니다.</p>
-        <div style=${{ padding: '18px 20px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p className="muted" style=${{ margin: '16px 20px 0', lineHeight: 1.6 }}>썸네일을 누르면 바로 재생돼요. 두 영상을 번갈아 보고 남길 것을 고르세요.</p>
+        <div style=${{ padding: '16px 20px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           ${!dupes.length ? html`<div className="center" style=${{ padding: '40px 0' }}>중복으로 보이는 영상이 없어요</div>` : null}
           ${dupes.map((g, gi) => html`<section key=${gi} className="dgroup">
             <div className="dgroup-h">${g.reason}<span>${g.items.length}개</span></div>
-            ${g.items.map(v => html`<div key=${v.youtubeId} className="drow">
-              <a className="thumb" style=${bg(thumb(v.youtubeId))} href=${'https://studio.youtube.com/video/' + v.youtubeId + '/edit'} target="_blank" rel="noopener" aria-label="유튜브 스튜디오에서 열기">
-                ${v.duration ? html`<span className="len">${fmtLen(v.duration)}</span>` : null}
-              </a>
-              <div><b>${v.title}</b><small className=${v.registered ? 'on' : ''}>${v.registered ? '앱에 등록됨' : '미등록'}</small></div>
-              ${!v.registered && !g.items.some(x => x.registered)
-                ? html`<button className="reg" onClick=${() => go(v)} disabled=${!!working}>등록</button>` : null}
-              <button onClick=${() => exclude(v)} disabled=${!!working}>${working === v.youtubeId ? '…' : '제외'}</button>
-            </div>`)}
+            ${g.items.map(v => {
+              const anyReg = g.items.some(x => x.registered);
+              const state = (v.duration ? fmtLen(v.duration) + ' · ' : '') + (v.registered ? '앱에 등록됨' : '미등록');
+              const btns = html`<div className="dbtns">
+                <button className="reg" onClick=${() => go(v)} disabled=${!!working || v.registered || anyReg}>${v.registered ? '등록됨' : '등록'}</button>
+                <button onClick=${() => exclude(v)} disabled=${!!working}>${working === v.youtubeId ? '…' : '제외'}</button>
+                <button className="del" onClick=${() => setDelTarget(v)} disabled=${!!working}>유튜브에서 삭제</button>
+              </div>`;
+              return playing === v.youtubeId ? html`<div key=${v.youtubeId} className="dbox">
+                <div className="dplay"><iframe src=${'https://www.youtube-nocookie.com/embed/' + v.youtubeId + '?autoplay=1&rel=0&playsinline=1'} title=${v.title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen></iframe></div>
+                <div className="dmeta"><b>${v.title}</b><span className="muted" style=${{ fontSize: '12px', flex: '0 0 auto' }}>${state}</span></div>
+                ${btns}
+              </div>` : html`<div key=${v.youtubeId} className="dbox">
+                <div className="dline">
+                  <button className="thumb" style=${bg(thumb(v.youtubeId))} onClick=${() => setPlaying(v.youtubeId)} aria-label=${v.title + ' 재생'}>
+                    ${Ico.play(22)}
+                    ${v.duration ? html`<span className="len">${fmtLen(v.duration)}</span>` : null}
+                  </button>
+                  <div><b>${v.title}</b><small className=${v.registered ? 'on' : ''}>${v.registered ? '앱에 등록됨' : '미등록'}</small></div>
+                </div>
+                ${btns}
+              </div>`;
+            })}
           </section>`)}
-          ${dupes.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6 }}>'제외'는 앱 목록에서만 빼는 것이고 유튜브 영상은 그대로 남아요. 썸네일을 누르면 유튜브 스튜디오가 열려서 거기서 바로 지울 수도 있어요.</p>` : null}
+          ${dupes.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6 }}>'제외'는 앱 목록에서만 빼고 유튜브 영상은 남겨요. '유튜브에서 삭제'는 유튜브 채널에서 영상을 완전히 지워요.</p>` : null}
         </div>`}
+      ${delTarget ? html`<div className="modal-bg" onClick=${e => { if (e.target === e.currentTarget) setDelTarget(null); }}>
+        <div className="modal" role="dialog" aria-modal="true">
+          <b>유튜브에서 영상을 삭제할까요?</b>
+          <p>"${delTarget.title}"${delTarget.duration ? ' (' + fmtLen(delTarget.duration) + ')' : ''}<br/>유튜브에서 완전히 지워지고 되돌릴 수 없어요.${delTarget.registered ? html`<br/>앱 목록에서도 함께 지워져요.` : null}</p>
+          <div className="two">
+            <button onClick=${() => setDelTarget(null)}>취소</button>
+            <button className="go" onClick=${doDelete}>삭제</button>
+          </div>
+        </div>
+      </div>` : null}
     </div>`;
 }
 
