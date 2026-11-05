@@ -133,6 +133,20 @@ textarea.inp{height:auto;padding:12px 14px;resize:none}
 .keys button:active{background:#F1EADD}
 .keys .ghost{background:transparent;border:none;font-size:16px;color:var(--muted)}
 .keys .hide{visibility:hidden}
+.notice{margin:18px 20px 0;text-decoration:none;color:var(--ink);background:var(--soft);border:1px solid var(--ring);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.notice i{width:40px;height:40px;flex:0 0 auto;border-radius:20px;background:#fff;border:1px solid var(--ring);display:flex;align-items:center;justify-content:center}
+.notice span{flex:1;display:flex;flex-direction:column;gap:2px}
+.notice b{font-size:14px}
+.syncbox{margin:4px 20px 0;background:var(--soft);border:1px solid var(--line);border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.syncbar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.syncbar div{height:8px;background:var(--accent);border-radius:4px}
+.synccnt{display:flex;gap:16px;font-size:13px}
+.synccnt b{font-size:16px}
+.prow{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px}
+.prow .thumb{width:104px;aspect-ratio:16/9;flex:0 0 auto;border-radius:10px}
+.prow div{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.prow b{font-size:14px;font-weight:700;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.prow button{height:36px;padding:0 14px;flex:0 0 auto;border-radius:18px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700}
 .center{padding:80px 24px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:14px}
 </style>
 </head>
@@ -156,6 +170,7 @@ const ALBUM_ICON = {
   '운동': 'M6.5 7v10M17.5 7v10M3.5 10v4M20.5 10v4M6.5 12h11'
 };
 const TOKEN_KEY = 'fv_token';
+let PREFILL = null;
 
 function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; } }
 function saveToken(t) { try { if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); } catch (e) {} }
@@ -255,6 +270,7 @@ const Ico = {
   play: s => html`<svg aria-hidden="true" width=${s} height=${s} viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#FFFFFF" fillOpacity="0.92"></circle><polygon points="10,7.5 16.5,12 10,16.5" fill="#2B3A5C"></polygon></svg>`,
   playW: html`<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20" fill="#FFFFFF"></polygon></svg>`,
   shuffle: html`<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>`,
+  sync: html`<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A6A35" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><polyline points="21 4 21 10 15 10"></polyline></svg>`,
   check: html`<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D5E27" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="5 12 10 17 19 7"></polyline></svg>`,
   cam: html`<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2B3A5C" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"></rect><polygon points="16 10 21 7 21 17 16 14"></polygon></svg>`,
   house: html`<svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path><polygon points="10 11 15 14 10 17" fill="#FFFFFF"></polygon></svg>`
@@ -313,7 +329,7 @@ function AlbumIcon({ name }) {
   return html`<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2B3A5C" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d=${d}></path></svg>`;
 }
 
-function Home({ videos }) {
+function Home({ videos, pending }) {
   const [shift, setShift] = useState(0);
   const mem = useMemo(() => pickMemory(videos, shift), [videos, shift]);
   const albums = useMemo(() => DEFAULT_ALBUMS.map(n => ({ name: n, count: videos.filter(v => v.albums.indexOf(n) >= 0).length })), [videos]);
@@ -336,6 +352,13 @@ function Home({ videos }) {
         <div><small>${t.m}월 ${t.d}일 ${dow}요일</small><h1>우리 가족 영상</h1></div>
         <img src="icon-192.png" alt="" />
       </header>
+
+      ${pending && pending.pending.length ? html`
+        <a className="notice" href="#/sync">
+          <i>${Ico.sync}</i>
+          <span><b>유튜브에 새 영상 ${pending.pending.length}개</b><span className="muted" style=${{ fontSize: '12px' }}>아직 앱에 등록하지 않은 영상이 있어요</span></span>
+          ${Ico.next}
+        </a>` : null}
 
       ${!mem ? html`
         <section className="sec">
@@ -507,15 +530,60 @@ function Player({ videos, id }) {
     </div>`;
 }
 
+function Sync({ pending, reload }) {
+  const [busy, setBusy] = useState(false);
+  const refresh = async () => { setBusy(true); await reload(); setBusy(false); };
+  const go = v => { PREFILL = { youtubeId: v.youtubeId, title: v.title }; location.hash = '#/new'; };
+  const bar = html`
+    <div className="bar">
+      <a className="ib" href="#/" aria-label="홈으로">${Ico.back}</a>
+      <h1 className="grow">유튜브에서 가져오기</h1>
+      <button className="ib" aria-label="다시 확인" onClick=${refresh} disabled=${busy}>${Ico.sync}</button>
+    </div>`;
+  if (!pending) return html`<div className="wrap">${bar}<div className="center">${busy ? '확인 중…' : '유튜브 채널을 확인하는 중이에요…'}</div></div>`;
+  if (pending.error) return html`<div className="wrap">${bar}<div className="center">
+    ${pending.error === 'YT_OFF' ? 'Apps Script에서 YouTube 서비스를 켜야 사용할 수 있어요' : '유튜브 채널을 확인하지 못했어요'}
+    <button className="pill-btn" onClick=${refresh}>다시 시도</button></div></div>`;
+  const pct = pending.total ? Math.round(pending.done / pending.total * 100) : 100;
+  const p = P(pending.from);
+  return html`
+    <div className="wrap" style=${{ paddingBottom: '30px' }}>
+      ${bar}
+      <div className="syncbox">
+        <div style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <b style=${{ fontSize: '14px' }}>${p.y}년 ${p.m}월 ${p.d}일 이후 올린 영상 ${pending.total}개 중</b>
+        </div>
+        <div className="syncbar"><div style=${{ width: pct + '%' }}></div></div>
+        <div className="synccnt">
+          <span><b>${pending.done}</b> 앱에 등록됨</span>
+          <span style=${{ color: 'var(--gold)' }}><b>${pending.pending.length}</b> 아직 안 올림</span>
+        </div>
+      </div>
+      <div className="sec" style=${{ marginTop: '22px' }}>
+        <div className="h2row"><h2>아직 앱에 없는 영상</h2><i></i><span className="muted" style=${{ fontSize: '12px' }}>최근 올린 순</span></div>
+        ${!pending.pending.length ? html`<div className="center" style=${{ padding: '40px 0' }}>모두 등록했어요</div>` : null}
+        <div style=${{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          ${pending.pending.map(v => html`<div key=${v.youtubeId} className="prow">
+            <span className="thumb" style=${bg(thumb(v.youtubeId))}></span>
+            <div><b>${v.title}</b><span className="muted" style=${{ fontSize: '12px' }}>유튜브 업로드 ${P(v.uploadedAt).m}월 ${P(v.uploadedAt).d}일</span></div>
+            <button onClick=${() => go(v)}>등록</button>
+          </div>`)}
+        </div>
+        ${pending.pending.length ? html`<p className="muted" style=${{ fontSize: '12px', lineHeight: 1.6, marginTop: '18px' }}>'등록'을 누르면 링크와 제목이 채워진 등록 화면이 열립니다. 촬영일과 앨범만 고르면 끝납니다.</p>` : null}
+      </div>
+    </div>`;
+}
+
 function Upload({ videos, editId, onSaved }) {
   const ed = editId ? videos.find(x => x.id === editId) : null;
+  const [pre] = useState(() => { const x = editId ? null : PREFILL; PREFILL = null; return x; });
   const t = today();
   const p0 = ed ? P(ed.date) : t;
-  const [url, setUrl] = useState(ed ? 'https://youtu.be/' + ed.youtubeId : '');
-  const [yid, setYid] = useState(ed ? ed.youtubeId : '');
-  const [check, setCheck] = useState(ed ? { ok: true, text: '영상 확인됨' } : null);
+  const [url, setUrl] = useState(ed ? 'https://youtu.be/' + ed.youtubeId : pre ? 'https://youtu.be/' + pre.youtubeId : '');
+  const [yid, setYid] = useState(ed ? ed.youtubeId : pre ? pre.youtubeId : '');
+  const [check, setCheck] = useState(ed || pre ? { ok: true, text: '영상 확인됨' } : null);
   const [checking, setChecking] = useState(false);
-  const [title, setTitle] = useState(ed ? ed.title : '');
+  const [title, setTitle] = useState(ed ? ed.title : pre ? pre.title.slice(0, 100) : '');
   const [mode, setMode] = useState(ed ? ed.precision : 'day');
   const [day, setDay] = useState(ed && ed.precision === 'day' ? ed.date : t.y + '-' + pad(t.m) + '-' + pad(t.d));
   const [yy, setYy] = useState(p0.y);
@@ -669,7 +737,18 @@ function App() {
   const [token, setTok] = useState(getToken());
   const [videos, setVideos] = useState(null);
   const [err, setErr] = useState('');
+  const [pending, setPending] = useState(null);
   const route = useHash();
+
+  const loadPending = async () => {
+    try {
+      const r = await api('pending');
+      setPending(r.ok ? r : { error: r.error || 'FAIL', pending: [] });
+    } catch (e) {
+      setPending({ error: 'NET', pending: [] });
+    }
+  };
+  const afterSave = async () => { await load(); loadPending(); };
 
   const load = async () => {
     setErr('');
@@ -686,7 +765,7 @@ function App() {
     window.addEventListener('fv-auth', f);
     return () => window.removeEventListener('fv-auth', f);
   }, []);
-  useEffect(() => { if (token) load(); }, [token]);
+  useEffect(() => { if (token) { load(); loadPending(); } }, [token]);
   useEffect(() => { window.scrollTo(0, 0); }, [route.join('/')]);
 
   if (!token) return html`<${Login} onOk=${tk => setTok(tk)} />`;
@@ -697,9 +776,10 @@ function App() {
   if (page === 'year') return html`<${YearView} key=${arg} videos=${videos} year=${arg} />`;
   if (page === 'album') return html`<${AlbumView} videos=${videos} name=${arg} />`;
   if (page === 'v') return html`<${Player} key=${arg} videos=${videos} id=${arg} />`;
-  if (page === 'new') return html`<${Upload} key="new" videos=${videos} onSaved=${load} />`;
-  if (page === 'edit') return html`<${Upload} key=${'e' + arg} videos=${videos} editId=${arg} onSaved=${load} />`;
-  return html`<${Home} videos=${videos} />`;
+  if (page === 'new') return html`<${Upload} key="new" videos=${videos} onSaved=${afterSave} />`;
+  if (page === 'edit') return html`<${Upload} key=${'e' + arg} videos=${videos} editId=${arg} onSaved=${afterSave} />`;
+  if (page === 'sync') return html`<${Sync} pending=${pending} reload=${loadPending} />`;
+  return html`<${Home} videos=${videos} pending=${pending && !pending.error ? pending : null} />`;
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
